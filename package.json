@@ -1,21 +1,68 @@
 {
-  "name": "my-app",
+  "name": "mybio",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fontsource/tiro-devanagari-marathi": "^5.0.13",
+    "@formatjs/intl-relativetimeformat": "^11.2.14",
+    "@fortawesome/fontawesome-free": "^6.5.2",
+    "@google-cloud/translate": "^8.3.0",
+    "@indic-transliteration/sanscript": "^1.3.1",
+    "@pdf-lib/fontkit": "^1.1.1",
+    "@react-pdf-viewer/core": "^3.12.0",
+    "@react-pdf-viewer/default-layout": "^3.12.0",
+    "@react-pdf-viewer/toolbar": "^3.12.0",
+    "@react-pdf/renderer": "^3.4.4",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "astro": "^4.11.3",
+    "axios": "^1.7.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "downloadjs": "^1.4.7",
+    "express": "^4.19.2",
+    "file-saver": "^2.0.5",
+    "firebase": "^10.13.1",
+    "fontkit": "^2.0.2",
+    "fs": "^0.0.1-security",
+    "html-to-image": "^1.11.11",
+    "ime": "^0.7.1",
+    "jquery": "^3.7.1",
+    "jspdf": "^2.5.1",
+    "mysql": "^2.18.1",
+    "pdf-lib": "^1.17.1",
+    "pdfjs": "^2.5.3",
+    "pdfjs-dist": "^2.16.105",
+    "pdfkit": "^0.15.0",
+    "pdfmake": "^0.2.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-easy-crop": "^5.0.8",
+    "react-image-crop": "^11.0.6",
+    "react-intl": "^6.6.8",
+    "react-pdf": "^9.0.0",
+    "react-pdf-js": "^5.1.0",
+    "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
+    "react-slick": "^0.30.2",
+    "react-stripe-checkout": "^2.6.3",
+    "react-to-pdf": "^1.0.1",
+    "react-youtube": "^10.1.0",
+    "slick-carousel": "^1.8.1",
+    "stripe": "^15.9.0",
+    "swiper": "^11.1.4",
+    "transliterate": "^1.0.1",
+    "transliteration": "^2.3.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -34,5 +81,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "gh-pages": "^6.1.1"
+  },
+
+
+"homepage": "/"
+
+  
 }
