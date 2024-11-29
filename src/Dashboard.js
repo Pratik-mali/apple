@@ -5,6 +5,7 @@ import Inventory from "./Inventory";
 // Placeholder imports for other components
 import Billing from "./Billing";
 import InvoiceList from "./InvoiceList";
+import CustomerComponent from "./CustomerComponent";
 // import Customers from "./Customers";
 // import Reports from "./Reports";
 
@@ -19,8 +20,8 @@ const Dashboard = () => {
       // Uncomment and add other components as needed
       case "Billing":
         return <Billing />;
-      // case "Customers":
-      //   return <Customers />;
+      case "Customers":
+        return <CustomerComponent />;
       // case "Reports":
       //   return <Reports />;
       case "InvoiceList":

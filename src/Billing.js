@@ -33,6 +33,7 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
 
 
   const inputRefs = useRef([]);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -317,15 +318,17 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
   useEffect(() => {
     console.log("Handle Add Row is stable now!");
   }, [handleAddRow]);
-
-  const handleKeyDown = (e, index, fieldIndex) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const nextFieldIndex = index * 4 + fieldIndex + 1; // Navigate all inputs
-      const nextField = inputRefs.current[nextFieldIndex];
-      nextField?.focus();
+  const handleEnterKeyPress = (event, index) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevent default behavior (e.g., form submission)
+      const nextInput = inputRefs.current[index + 1];
+      if (nextInput) {
+        nextInput.focus();
+      }
     }
   };
+  
+  
 
   const calculateTotal = () => {
     return formFields.reduce(
@@ -350,102 +353,179 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
 
   const total = calculateTotal();
   const dueAmount = total.finalAmount - parseFloat(paidAmount || 0);
+  const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
 
-
+  const handleNextField = () => {
+    if (currentFieldIndex + 1 < inputRefs.current.length) {
+      setCurrentFieldIndex(currentFieldIndex + 1);
+      inputRefs.current[currentFieldIndex + 1].focus();
+    } else {
+      alert("All fields completed!");
+    }
+  };
+  
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Billing</h1>
-
+    <div
+      style={{
+        padding: "20px",
+        fontFamily: "Arial, sans-serif",
+        backgroundColor: "#f8f9fa",
+        color: "#333",
+      }}
+    >
+      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Billing</h1>
+  
       {/* Customer Section */}
-  {/* Customer Section */}
-  <div>
-  <h2>Customer</h2>
-  {/* Customer Input */}
-  <input
-    type="text"
-    placeholder="Enter customer name"
-    value={selectedCustomer}
-    onChange={handleCustomerInput}
-    onKeyDown={handleCustomerKeyDown}
-  />
-  {filteredCustomers.length > 0 && (
-    <ul>
-      {filteredCustomers.map((customer, idx) => (
-        <li
-          key={customer.id}
+      <div
+        style={{
+          backgroundColor: "#fff",
+          padding: "20px",
+          marginBottom: "20px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <h2 style={{ marginBottom: "10px", borderBottom: "2px solid #ccc" }}>
+          Customer
+        </h2>
+        <input
+          type="text"
+          placeholder="Enter customer name"
+          value={selectedCustomer}
+          onChange={handleCustomerInput}
+          onKeyDown={handleCustomerKeyDown}
           style={{
-            backgroundColor: highlightedCustomerIndex === idx ? "#ddd" : "#fff",
+            width: "100%",
+            padding: "10px",
+            marginBottom: "10px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
           }}
-          onClick={async () => {
-            setSelectedCustomer(customer.name);
-            setFilteredCustomers([]);
-
-            // Use getDoc instead of getDocs
-            const customerRef = doc(db, "customers", customer.id);
-            const customerDoc = await getDoc(customerRef);
-
-            if (customerDoc.exists()) {
-              const customerData = customerDoc.data();
-              setContactNumber(customerData.contactNumber || "");
-              setAddress(customerData.address || "");
-              dueAmount(customerData.dueAmount || 0); // Set due amount
-            }
+        />
+        {filteredCustomers.length > 0 && (
+          <ul
+            style={{
+              listStyle: "none",
+              margin: "0",
+              padding: "0",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              maxHeight: "150px",
+              overflowY: "auto",
+            }}
+          >
+            {filteredCustomers.map((customer, idx) => (
+              <li
+                key={customer.id}
+                style={{
+                  padding: "10px",
+                  backgroundColor:
+                    highlightedCustomerIndex === idx ? "#f1f1f1" : "#fff",
+                  cursor: "pointer",
+                }}
+                onClick={async () => {
+                  setSelectedCustomer(customer.name);
+                  setFilteredCustomers([]);
+                  const customerRef = doc(db, "customers", customer.id);
+                  const customerDoc = await getDoc(customerRef);
+  
+                  if (customerDoc.exists()) {
+                    const customerData = customerDoc.data();
+                    setContactNumber(customerData.contactNumber || "");
+                    setAddress(customerData.address || "");
+                    dueAmount(customerData.dueAmount || 0); // Set due amount
+                  }
+                }}
+              >
+                {customer.name}
+              </li>
+            ))}
+          </ul>
+        )}
+        {selectedCustomer && (
+          <div style={{ marginTop: "10px" }}>
+            <div style={{ marginBottom: "10px" }}>
+              <label style={{ display: "block", fontWeight: "bold" }}>
+                Contact Number:
+              </label>
+              <input
+                type="text"
+                value={contactNumber}
+                onChange={(e) => setContactNumber(e.target.value)}
+                placeholder="Enter contact number"
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                }}
+                disabled={!isNewCustomer}
+              />
+            </div>
+            <div style={{ marginBottom: "10px" }}>
+              <label style={{ display: "block", fontWeight: "bold" }}>
+                Address:
+              </label>
+              <textarea
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter address"
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  resize: "vertical",
+                }}
+                disabled={!isNewCustomer}
+              />
+            </div>
+            {!isNewCustomer && (
+              <div>
+                <label style={{ fontWeight: "bold" }}>Due Amount:</label>
+                <p style={{ fontSize: "18px", color: "#d9534f" }}>
+                  ₹{outstandingAmount.toFixed(2)}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+  
+      {/* Product Section */}
+      <div
+        style={{
+          backgroundColor: "#fff",
+          padding: "20px",
+          marginBottom: "20px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <h2 style={{ marginBottom: "10px", borderBottom: "2px solid #ccc" }}>
+          Products
+        </h2>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            marginBottom: "10px",
           }}
         >
-          {customer.name}
-        </li>
-      ))}
-    </ul>
-  )}
-
-  {/* Contact, Address, and Due Amount */}
-  {selectedCustomer && (
-    <div>
-      {/* Contact Number */}
-      <label>Contact Number: </label>
-      <input
-        type="text"
-        value={contactNumber}
-        onChange={(e) => setContactNumber(e.target.value)}
-        placeholder="Enter contact number"
-        disabled={!isNewCustomer} // Allow editing only for new customers
-      />
-
-      {/* Address */}
-      <label>Address: </label>
-      <textarea
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
-        placeholder="Enter address"
-        disabled={!isNewCustomer} // Allow editing only for new customers
-      />
-
-      {/* Due Amount */}
-      {!isNewCustomer && (
-        <div>
-          <label>Due Amount: </label>
-          <p>₹{outstandingAmount.toFixed(2)}</p>
-        </div>
-      )}
-    </div>
-  )}
-</div>
-
-
-
-
-      {/* Product Section */}
-      <div>
-        <h2>Products</h2>
-        <table>
           <thead>
-            <tr>
-              <th>Product Name</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Discount</th>
-              <th>Amount</th>
+            <tr style={{ backgroundColor: "#f1f1f1" }}>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Product Name
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Price</th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Quantity
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Discount
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Amount</th>
             </tr>
           </thead>
           <tbody>
@@ -456,20 +536,42 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
     type="text"
     value={field.productName}
     onChange={(e) => handleProductInput(index, e.target.value)}
-    onKeyDown={(e) => handleProductKeyDown(e, index)}
+    onKeyDown={(e) => {
+      handleProductKeyDown(e, index);
+      if (e.key === "ArrowDown" && filteredProducts.length > 0) {
+        setHighlightedProductIndex(
+          (prev) => (prev + 1) % filteredProducts.length
+        );
+      } else if (e.key === "ArrowUp" && filteredProducts.length > 0) {
+        setHighlightedProductIndex(
+          (prev) =>
+            (prev - 1 + filteredProducts.length) % filteredProducts.length
+        );
+      } else if (e.key === "Enter" && filteredProducts.length > 0) {
+        handleProductSelection(index, filteredProducts[highlightedProductIndex]);
+      }
+    }}
     ref={(el) => (inputRefs.current[index * 4] = el)}
+    style={{
+      width: "100%",
+      padding: "5px",
+      border: "1px solid #ccc",
+      borderRadius: "4px",
+    }}
   />
   {focusedIndex === index && filteredProducts.length > 0 && (
     <ul
       style={{
+        position: "absolute",
+        zIndex: 1,
         border: "1px solid #ccc",
         padding: "5px",
         maxHeight: "150px",
         overflowY: "auto",
-        position: "absolute",
-        zIndex: 1,
         backgroundColor: "#fff",
         width: "200px",
+        marginTop: "2px",
+        listStyle: "none",
       }}
     >
       {filteredProducts.map((product, idx) => (
@@ -478,7 +580,8 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
           onClick={() => handleProductSelection(index, product)}
           style={{
             padding: "5px",
-            backgroundColor: highlightedProductIndex === idx ? "#ddd" : "#fff",
+            backgroundColor:
+              highlightedProductIndex === idx ? "#ddd" : "#fff",
             cursor: "pointer",
           }}
           onMouseEnter={() => setHighlightedProductIndex(idx)}
@@ -490,52 +593,95 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
   )}
 </td>
 
-                <td>
+                <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                   <input
                     type="number"
                     value={field.price}
-                    onChange={(e) => handleFieldChange(index, "price", e.target.value)}
+                    onChange={(e) =>
+                      handleFieldChange(index, "price", e.target.value)
+                    }
                     ref={(el) => (inputRefs.current[index * 4 + 1] = el)}
-                    onKeyDown={(e) => handleKeyDown(e, index, 1)}
+                    style={{
+                      width: "100%",
+                      padding: "5px",
+                      border: "1px solid #ccc",
+                      borderRadius: "4px",
+                    }}
                   />
                 </td>
-                <td>
+                <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                   <input
                     type="number"
                     value={field.quantity}
-                    onChange={(e) => handleFieldChange(index, "quantity", e.target.value)}
+                    onChange={(e) =>
+                      handleFieldChange(index, "quantity", e.target.value)
+                    }
                     ref={(el) => (inputRefs.current[index * 4 + 2] = el)}
-                    onKeyDown={(e) => handleKeyDown(e, index, 2)}
+                    style={{
+                      width: "100%",
+                      padding: "5px",
+                      border: "1px solid #ccc",
+                      borderRadius: "4px",
+                    }}
                   />
                 </td>
-                <td>
+                <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                   <input
                     type="number"
                     value={field.discount}
-                    onChange={(e) => handleFieldChange(index, "discount", e.target.value)}
+                    onChange={(e) =>
+                      handleFieldChange(index, "discount", e.target.value)
+                    }
                     ref={(el) => (inputRefs.current[index * 4 + 3] = el)}
-                    onKeyDown={(e) => handleKeyDown(e, index, 3)}
+                    style={{
+                      width: "100%",
+                      padding: "5px",
+                      border: "1px solid #ccc",
+                      borderRadius: "4px",
+                    }}
                   />
                 </td>
-                <td>
-  ₹
-  {(
-    (parseFloat(field.price) || 0) *
-    (parseFloat(field.quantity) || 0) *
-    (field.discount ? 1 - parseFloat(field.discount) / 100 : 1)
-  ).toFixed(2)}
-</td>
-
+                <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                  ₹
+                  {(
+                    (parseFloat(field.price) || 0) *
+                    (parseFloat(field.quantity) || 0) *
+                    (field.discount
+                      ? 1 - parseFloat(field.discount) / 100
+                      : 1)
+                  ).toFixed(2)}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <button onClick={handleAddRow}>Add Row</button>
+        <button
+          onClick={handleAddRow}
+          style={{
+            backgroundColor: "#5cb85c",
+            color: "#fff",
+            padding: "10px 15px",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Add Row
+        </button>
       </div>
-
+  
       {/* Total Section */}
-      <div>
-        <h2>Total</h2>
+      <div
+        style={{
+          backgroundColor: "#fff",
+          padding: "20px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <h2 style={{ marginBottom: "10px", borderBottom: "2px solid #ccc" }}>
+          Total
+        </h2>
         <p>Total Amount: ₹{total.totalAmount.toFixed(2)}</p>
         <p>Total Discount: ₹{total.totalDiscount.toFixed(2)}</p>
         <p>Final Amount: ₹{total.finalAmount.toFixed(2)}</p>
@@ -544,16 +690,33 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
           placeholder="Paid Amount"
           value={paidAmount}
           onChange={(e) => setPaidAmount(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginBottom: "10px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+          }}
         />
         <p>Due Amount: ₹{dueAmount.toFixed(2)}</p>
-
-        <button onClick={handleStoreInvoice}>Store Invoice</button>
-
-
-        
-        </div>
+        <button
+          onClick={handleStoreInvoice}
+          style={{
+            backgroundColor: "#0275d8",
+            color: "#fff",
+            padding: "10px 15px",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Store Invoice
+        </button>
+      </div>
     </div>
-  );
+  ); 
+  
+  
 };
 
 export default Billing;
