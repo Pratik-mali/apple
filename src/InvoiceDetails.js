@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { db } from "./firebase"; // Ensure Firebase is initialized correctly
+import { db } from "./firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { useParams } from "react-router-dom"; // For route parameters
+import { useParams } from "react-router-dom";
+import { PDFDownloadLink } from "@react-pdf/renderer"; // Import PDFDownloadLink
+import InvoicePDF from "./InvoicePDF"; // Import your InvoicePDF component
 
 const InvoiceDetails = () => {
-  const { invoiceId } = useParams();  // Get the invoiceId from the URL
+  const { invoiceId } = useParams();
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -12,7 +14,6 @@ const InvoiceDetails = () => {
     const fetchInvoiceDetails = async () => {
       try {
         const invoiceDoc = await getDoc(doc(db, "invoices", invoiceId));
-
         if (invoiceDoc.exists()) {
           setInvoice(invoiceDoc.data());
         } else {
@@ -98,6 +99,23 @@ const InvoiceDetails = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Print Invoice Button */}
+      <div style={{ marginTop: "20px" }}>
+        <PDFDownloadLink
+          document={<InvoicePDF invoiceData={invoice} />}
+          fileName={`Invoice-${invoiceId}.pdf`}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#007BFF",
+            color: "#FFF",
+            textDecoration: "none",
+            borderRadius: "5px",
+          }}
+        >
+          {({ loading }) => (loading ? "Preparing document..." : "Print Invoice")}
+        </PDFDownloadLink>
+      </div>
     </div>
   );
 };
