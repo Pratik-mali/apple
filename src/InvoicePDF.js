@@ -17,7 +17,7 @@ const InvoicePDF = ({ invoiceData }) => {
       fontSize: 8,
     },
     customerDetails: { fontSize: 8, textAlign: "center", marginBottom: 5 },
-    table: { display: "table", width: "100%", borderStyle: "solid", borderWidth: 2, borderColor: "#000" },
+    table: { display: "table", width: "100%", height:"46%", borderStyle: "solid", borderWidth: 2, borderColor: "#000" },
     tableRow: { flexDirection: "row" },
     tableCellHeader: {
       paddingLeft: 5,
