@@ -20,7 +20,7 @@ const Sidebar = ({ setActiveComponent }) => {
         Invoice List
       </button>
       <button style={styles.button} onClick={() => setActiveComponent("InvoiceGenerator")}>
-        Invoice Generator
+        Add Purchase
       </button>
       <button style={styles.button} onClick={() => setActiveComponent("PurchaseList")}>
         Purchase List

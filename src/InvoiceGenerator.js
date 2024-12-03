@@ -45,10 +45,21 @@ const InvoiceGenerator = () => {
   const handleProductChange = (index, field, value) => {
     const updatedProducts = [...products];
     updatedProducts[index][field] = field === 'quantity' || field === 'rate' ? Number(value) : value;
+
+    // Calculate the amount for the row
     if (field === 'quantity' || field === 'rate') {
       updatedProducts[index].amount = updatedProducts[index].quantity * updatedProducts[index].rate;
     }
+
     setProducts(updatedProducts);
+
+    // Automatically add a new row if the last row is completely filled
+    const isRowFilled = (row) =>
+      row.name.trim() && row.size.trim() && row.quantity > 0 && row.rate > 0;
+
+    if (isRowFilled(updatedProducts[index]) && index === updatedProducts.length - 1) {
+      handleAddProduct();
+    }
   };
 
   const handleAddProduct = () => {
@@ -80,44 +91,51 @@ const InvoiceGenerator = () => {
 
   const handleSaveInvoice = async () => {
     try {
+      // Filter out empty rows
+      const filteredProducts = products.filter(
+        (product) =>
+          product.name.trim() &&
+          product.size.trim() &&
+          product.quantity > 0 &&
+          product.rate > 0
+      );
+
       // Calculate totals
       const totals = calculateTotals();
-  
+
       // Prepare invoice data
       const invoiceData = {
         invoiceNumber,
         invoiceDate,
         state,
         partyDetails,
-        products,
+        products: filteredProducts,
         cgstRate,
         sgstRate,
         igstRate,
         totals,
       };
-  
+
       // Save the invoice to Firestore
       await addDoc(collection(db, 'PurchaseInvoices'), invoiceData);
-  
+
       // Generate the PDF using ReactPDF
       const pdfBlob = await ReactPDF.pdf(<InvoicePrint invoiceData={invoiceData} />).toBlob();
-  
+
       // Create a downloadable file for the user
       const link = document.createElement('a');
       link.href = URL.createObjectURL(pdfBlob);
       link.download = `Invoice-${invoiceData.invoiceNumber}.pdf`;
       link.click();
-  
+
       alert('Invoice saved successfully and downloaded!');
     } catch (error) {
       console.error('Error saving or printing invoice:', error);
       alert('Failed to save or print the invoice. Please try again.');
     }
   };
-  
 
   const totals = calculateTotals();
-
   const styles = {
     container: {
       fontFamily: 'Arial, sans-serif',
@@ -264,10 +282,7 @@ const InvoiceGenerator = () => {
               </td>
               <td style={styles.tableCell}>{product.amount.toFixed(2)}</td>
               <td style={styles.tableCell}>
-                <button
-                  onClick={() => handleRemoveProduct(index)}
-                  style={styles.button}
-                >
+                <button onClick={() => handleRemoveProduct(index)} style={styles.button}>
                   Remove
                 </button>
               </td>
