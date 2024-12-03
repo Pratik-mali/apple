@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     border: '1 solid #D1D5DB',
     fontSize: 10,
-    width:5
+ 
   },
   signatureLabel: {
     fontWeight: 'bold',
