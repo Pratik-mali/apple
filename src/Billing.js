@@ -531,24 +531,36 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
           <tbody>
             {formFields.map((field, index) => (
               <tr key={index}>
-                <td>
+     <td>
   <input
     type="text"
     value={field.productName}
     onChange={(e) => handleProductInput(index, e.target.value)}
     onKeyDown={(e) => {
       handleProductKeyDown(e, index);
-      if (e.key === "ArrowDown" && filteredProducts.length > 0) {
-        setHighlightedProductIndex(
-          (prev) => (prev + 1) % filteredProducts.length
-        );
-      } else if (e.key === "ArrowUp" && filteredProducts.length > 0) {
-        setHighlightedProductIndex(
-          (prev) =>
-            (prev - 1 + filteredProducts.length) % filteredProducts.length
-        );
-      } else if (e.key === "Enter" && filteredProducts.length > 0) {
-        handleProductSelection(index, filteredProducts[highlightedProductIndex]);
+
+      if (filteredProducts.length > 0) {
+        if (e.key === "ArrowDown") {
+          const nextIndex =
+            (highlightedProductIndex + 1) % filteredProducts.length;
+          setHighlightedProductIndex(nextIndex);
+        } else if (e.key === "ArrowUp") {
+          const prevIndex =
+            (highlightedProductIndex - 1 + filteredProducts.length) %
+            filteredProducts.length;
+          setHighlightedProductIndex(prevIndex);
+        } else if (e.key === "Enter") {
+          handleProductSelection(index, filteredProducts[highlightedProductIndex]);
+        }
+      }
+    }}
+    onBlur={() => {
+      // Auto-select product based on exact match with the entered product code
+      const matchedProduct = filteredProducts.find(
+        (product) => product.productCode === field.productName
+      );
+      if (matchedProduct) {
+        handleProductSelection(index, matchedProduct);
       }
     }}
     ref={(el) => (inputRefs.current[index * 4] = el)}
@@ -592,6 +604,8 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
     </ul>
   )}
 </td>
+
+
 
                 <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                   <input

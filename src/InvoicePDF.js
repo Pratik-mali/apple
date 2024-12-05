@@ -1,6 +1,7 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
 
+// Register the font
 Font.register({
   family: "Tiro Marathi",
   src: "./TiroDevanagariMarathi-Regular.ttf", // Adjust the path as per your project structure
@@ -8,17 +9,36 @@ Font.register({
 
 const InvoicePDF = ({ invoiceData }) => {
   const styles = StyleSheet.create({
-    page: { padding: 20 },
-    header: { textAlign: "center", marginBottom: 5 },
+    page: {
+      padding: 20,
+      flexDirection: "column",
+      height: "100%",
+    },
     dateContainer: {
       position: "absolute",
       top: 20,
       right: 20,
       fontSize: 8,
     },
-    customerDetails: { fontSize: 8, textAlign: "center", marginBottom: 5 },
-    table: { display: "table", width: "100%", height:"46%", borderStyle: "solid", borderWidth: 2, borderColor: "#000" },
-    tableRow: { flexDirection: "row" },
+    customerDetails: {
+      fontSize: 8,
+      textAlign: "center",
+    },
+    customerDetailsDiv: {
+      marginTop: 50,
+    },
+    table: {
+      display: "table",
+      width: "100%",
+      height: 280.27, // 46% of A4 page height
+      borderStyle: "solid",
+      borderWidth: 2,
+      borderColor: "#000",
+      flexDirection: "column",
+    },
+    tableRow: {
+      flexDirection: "row",
+    },
     tableCellHeader: {
       paddingLeft: 5,
       fontSize: 8,
@@ -34,8 +54,16 @@ const InvoicePDF = ({ invoiceData }) => {
       fontFamily: "Tiro Marathi",
       borderColor: "#000",
     },
-    lastCell: { borderRightWidth: 0 },
-    totalsRow: { flexDirection: "row", backgroundColor: "#f0f0f0" },
+    lastCell: {
+      borderRightWidth: 0,
+    },
+    totalsRow: {
+      flexDirection: "row",
+      backgroundColor: "#f0f0f0",
+      borderTopWidth: 1,
+      borderColor: "#000",
+      marginTop: "auto",
+    },
     totalsCell: {
       padding: 0,
       fontSize: 8,
@@ -44,7 +72,10 @@ const InvoicePDF = ({ invoiceData }) => {
       borderColor: "#000",
       textAlign: "right",
     },
-    totalsLastCell: { borderRightWidth: 0, textAlign: "right" },
+    totalsLastCell: {
+      borderRightWidth: 0,
+      textAlign: "right",
+    },
     summaryContainer: {
       width: "40%",
       marginLeft: "auto",
@@ -58,7 +89,10 @@ const InvoicePDF = ({ invoiceData }) => {
       justifyContent: "space-between",
       marginBottom: 2,
     },
-    summaryText: { fontSize: 8, fontWeight: "bolder" },
+    summaryText: {
+      fontSize: 8,
+      fontWeight: "bolder",
+    },
   });
 
   const formatDate = (timestamp) => {
@@ -80,7 +114,7 @@ const InvoicePDF = ({ invoiceData }) => {
         )}
 
         {/* Customer Details */}
-        <View>
+        <View style={styles.customerDetailsDiv}>
           {invoiceData.customer.name && (
             <Text style={styles.customerDetails}>
               Customer Name: {invoiceData.customer.name}
@@ -111,52 +145,49 @@ const InvoicePDF = ({ invoiceData }) => {
           </View>
 
           {/* Table Rows */}
-          {invoiceData.products
-  .filter(
-    (product) =>
-      product.productName &&
-      product.productName !== "-" &&
-      product.quantity &&
-      product.price !== undefined &&
-      product.price !== null &&
-      product.amount !== undefined &&
-      product.amount !== null
-  )
-  .map((product, index) => (
-    <View key={index} style={styles.tableRow}>
-      {/* Sr. No. */}
-      <Text style={[styles.tableCell, { width: "10%" }]}>{index + 1}</Text>
+          {[...Array(12)].map((_, index) => {
+            const product = invoiceData.products?.[index] || {};
 
-      {/* Product Name */}
-      <Text style={[styles.tableCell, { width: "30%" }]}>
-        {product.productName}
-      </Text>
+            return (
+              <View key={index} style={styles.tableRow}>
+                 {/* Conditionally render Serial Number if product exists */}
+        {product.productName ? (
+          <Text style={[styles.tableCell, { width: "10%" }]}>
+            {index + 1}
+          </Text>
+        ) : (
+          <Text style={[styles.tableCell, { width: "10%" }]}> </Text>
+        )}
 
-      {/* Quantity */}
-      <Text style={[styles.tableCell, { width: "15%" }]}>
-        {product.quantity}
-      </Text>
+                {/* Product Name */}
+                <Text style={[styles.tableCell, { width: "30%" }]}>
+                  {product.productName || ""}
+                </Text>
 
-      {/* Price */}
-      <Text style={[styles.tableCell, { width: "15%" }]}>
-        {product.price.toFixed(2)}
-      </Text>
+                {/* Quantity */}
+                <Text style={[styles.tableCell, { width: "15%" }]}>
+                  {product.quantity || ""}
+                </Text>
 
-      {/* Discount */}
-      <Text style={[styles.tableCell, { width: "15%" }]}>
-        {product.discount ? `${product.discount}%` : ""}
-      </Text>
+                {/* Rate */}
+                <Text style={[styles.tableCell, { width: "15%" }]}>
+                  {product.price?.toFixed(2)!==0 || ""}
+                </Text>
 
-      {/* Amount */}
-      <Text style={[styles.tableCell, styles.lastCell, { width: "15%" }]}>
-        {product.amount.toFixed(2)}
-      </Text>
-    </View>
-  ))}
+                {/* Discount */}
+                <Text style={[styles.tableCell, { width: "15%" }]}>
+                  {product.discount ? `${product.discount}%` : ""}
+                </Text>
 
-
-          {/* Totals Row */}
-          <View style={styles.totalsRow}>
+                {/* Amount */}
+                <Text style={[styles.tableCell, styles.lastCell, { width: "15%" }]}>
+                  {product.amount?.toFixed(2)!==0 || ""}
+                </Text>
+              </View>
+              
+            );
+          })}
+           <View style={styles.totalsRow}>
             <Text style={[styles.totalsCell, { width: "10%" }]}>-</Text>
             <Text style={[styles.totalsCell, { width: "30%" }]}>Totals</Text>
             <Text style={[styles.totalsCell, { width: "15%" }]}>-</Text>
@@ -169,10 +200,11 @@ const InvoicePDF = ({ invoiceData }) => {
             </Text>
           </View>
         </View>
+       
 
         {/* Totals Section */}
         <View style={styles.summaryContainer}>
-          {invoiceData.totals.finalAmount !== undefined && (
+          {invoiceData.totals?.finalAmount !== undefined && (
             <View style={styles.summaryRow}>
               <Text style={styles.summaryText}>Final Amount:</Text>
               <Text style={styles.summaryText}>
@@ -180,7 +212,7 @@ const InvoicePDF = ({ invoiceData }) => {
               </Text>
             </View>
           )}
-          {invoiceData.totals.paidAmount !== undefined && (
+          {invoiceData.totals?.paidAmount !== undefined && (
             <View style={styles.summaryRow}>
               <Text style={styles.summaryText}>Paid Amount:</Text>
               <Text style={styles.summaryText}>
@@ -188,7 +220,7 @@ const InvoicePDF = ({ invoiceData }) => {
               </Text>
             </View>
           )}
-          {invoiceData.totals.dueAmount > 0 && (
+          {invoiceData.totals?.dueAmount > 0 && (
             <View style={styles.summaryRow}>
               <Text style={styles.summaryText}>Due Amount:</Text>
               <Text style={styles.summaryText}>
