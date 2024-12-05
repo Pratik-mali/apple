@@ -1,5 +1,5 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
 
 // Register the font
 Font.register({
@@ -30,7 +30,7 @@ const InvoicePDF = ({ invoiceData }) => {
     table: {
       display: "table",
       width: "100%",
-      height: 280.27, // 46% of A4 page height
+      height: 160.27, // 46% of A4 page height
       borderStyle: "solid",
       borderWidth: 2,
       borderColor: "#000",
@@ -63,12 +63,12 @@ const InvoicePDF = ({ invoiceData }) => {
       borderTopWidth: 1,
       borderColor: "#000",
       marginTop: "auto",
+      padding:6
     },
     totalsCell: {
       padding: 0,
       fontSize: 8,
       fontWeight: "bold",
-      borderRightWidth: 1,
       borderColor: "#000",
       textAlign: "right",
     },
@@ -171,7 +171,7 @@ const InvoicePDF = ({ invoiceData }) => {
 
                 {/* Rate */}
                 <Text style={[styles.tableCell, { width: "15%" }]}>
-                  {product.price?.toFixed(2)!==0 || ""}
+                  {product.price?.toFixed(2) || ""}
                 </Text>
 
                 {/* Discount */}
@@ -181,7 +181,7 @@ const InvoicePDF = ({ invoiceData }) => {
 
                 {/* Amount */}
                 <Text style={[styles.tableCell, styles.lastCell, { width: "15%" }]}>
-                  {product.amount?.toFixed(2)!==0 || ""}
+                  {product.amount?.toFixed(2) || ""}
                 </Text>
               </View>
               
@@ -203,32 +203,45 @@ const InvoicePDF = ({ invoiceData }) => {
        
 
         {/* Totals Section */}
-        <View style={styles.summaryContainer}>
-          {invoiceData.totals?.finalAmount !== undefined && (
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryText}>Final Amount:</Text>
-              <Text style={styles.summaryText}>
-                {invoiceData.totals.finalAmount.toFixed(2)}
-              </Text>
-            </View>
-          )}
-          {invoiceData.totals?.paidAmount !== undefined && (
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryText}>Paid Amount:</Text>
-              <Text style={styles.summaryText}>
-                {invoiceData.totals.paidAmount.toFixed(2)}
-              </Text>
-            </View>
-          )}
-          {invoiceData.totals?.dueAmount > 0 && (
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryText}>Due Amount:</Text>
-              <Text style={styles.summaryText}>
-                {invoiceData.totals.dueAmount.toFixed(2)}
-              </Text>
-            </View>
-          )}
-        </View>
+       {/* Totals Section and QR Code */ }
+<View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8 }}>
+  {/* Totals Summary */}
+  <View style={[styles.summaryContainer, { width: "50%" }]}>
+    {invoiceData.totals?.finalAmount !== undefined && (
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryText}>Final Amount:</Text>
+        <Text style={styles.summaryText}>
+          {invoiceData.totals.finalAmount.toFixed(2)}
+        </Text>
+      </View>
+    )}
+    {invoiceData.totals?.paidAmount !== undefined && (
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryText}>Paid Amount:</Text>
+        <Text style={styles.summaryText}>
+          {invoiceData.totals.paidAmount.toFixed(2)}
+        </Text>
+      </View>
+    )}
+    {invoiceData.totals?.dueAmount > 0 && (
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryText}>Due Amount:</Text>
+        <Text style={styles.summaryText}>
+          {invoiceData.totals.dueAmount.toFixed(2)}
+        </Text>
+      </View>
+    )}
+  </View>
+
+  {/* QR Code */}
+  <View style={{ width: "40%", alignItems: "center", justifyContent: "center" }}>
+    <Image
+      style={{ width: 100, height: 100 }}
+      src={'/QR.JPG'}
+    />
+  </View>
+</View>
+
       </Page>
     </Document>
   );

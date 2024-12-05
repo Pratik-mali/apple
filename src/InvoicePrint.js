@@ -1,5 +1,5 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
 
 // Styling
 const styles = StyleSheet.create({
@@ -7,124 +7,12 @@ const styles = StyleSheet.create({
     padding: 30,
     fontSize: 10,
     fontFamily: 'Helvetica',
-    backgroundColor: '#f8f8f8',
-  },
-  letterhead: {
-    marginBottom: 20,
-    padding: 10,
-    textAlign: 'center',
-    backgroundColor: '#00468b',
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  section: {
-    marginBottom: 15,
-    padding: 10,
-    backgroundColor: '#ffffff',
-    borderRadius: 5,
-    border: '1px solid #d9d9d9',
-  },
-
-  table: {
-    display: 'table',
-    width: '100%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#d9d9d9',
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  tableRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#d9d9d9',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#00468b',
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 10,
-  },
-  tableCell: {
-    flex: 1,
-    textAlign: 'center',
-    padding: 5,
-    fontSize: 10,
-  },
-  footerSection: {
-    marginTop: 'auto', // Push to bottom
-    borderTop: '2 solid #4A90E2', // Blue border at the top
-    paddingTop: 15,
-    backgroundColor: '#F7F9FC', // Light background for the footer section
-  },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    padding: 10,
-    border: '1 solid #E6E9ED', // Light border around the row
-    borderRadius: 5,
-  },
-  bankDetails: {
-    width: '48%',
-    fontSize: 10,
-    padding: 10,
-    backgroundColor: '#FFFFFF', // White background for bank details
-    border: '1 solid #D1D5DB', // Grey border for separation
-    borderRadius: 5,
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', // Subtle shadow effect
-  },
-  totals: {
-    width: '48%',
-    fontSize: 10,
-    padding: 10,
-    backgroundColor: '#FFFFFF', // White background for totals
-    border: '1 solid #D1D5DB', // Grey border for separation
-    borderRadius: 5,
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', // Subtle shadow effect
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 5,
-    paddingVertical: 2,
-  },
-  label: {
-    fontWeight: 'bold',
-    fontSize: 10,
-    color: '#333', // Dark text for labels
-  },
-  value: {
-    textAlign: 'right',
-    fontSize: 10,
-    color: '#4A90E2', // Blue text for values
-  },
-  signatureSection: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#F0F4F8', // Light grey background for signature area
-    borderRadius: 5,
-    border: '1 solid #D1D5DB',
-    fontSize: 10,
- 
-  },
-  signatureLabel: {
-    fontWeight: 'bold',
-    fontSize: 10,
-    color: '#333',
-  },
-  footer: {
-    textAlign: 'center',
-    fontSize: 10,
-    marginTop: 15,
-    color: '#666', // Muted text color for footer
+    backgroundColor: '#fdf8f3', // Light Cream background
   },
   letterheadContainer: {
     marginBottom: 20,
     padding: 10,
-    backgroundColor: '#00468b',
+    backgroundColor: '#800000', // Maroon for bold header
     color: '#ffffff',
     borderRadius: 5,
   },
@@ -138,7 +26,7 @@ const styles = StyleSheet.create({
   contactDetails: {
     fontSize: 10,
     textAlign: 'center',
-    color: '#cce7ff',
+    color: '#f4d4d1', // Light cream for soft contrast
     marginBottom: 5,
   },
   gstin: {
@@ -150,7 +38,7 @@ const styles = StyleSheet.create({
   messageStrip: {
     marginTop: 10,
     padding: 5,
-    backgroundColor: '#ffcc00',
+    backgroundColor: '#ffcc00', // Subtle yellow for message strip
     borderRadius: 3,
     textAlign: 'center',
   },
@@ -160,6 +48,108 @@ const styles = StyleSheet.create({
     color: '#333333',
     textAlign: 'center',
   },
+  section: {
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 5,
+    border: '1px solid #d9d9d9', // Grey border for clean look
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+    paddingVertical: 2,
+  },
+  label: {
+    fontWeight: 'bold',
+    fontSize: 10,
+    color: '#800000', // Maroon for labels
+  },
+  value: {
+    textAlign: 'right',
+    fontSize: 10,
+    color: '#4A90E2', // Blue for values to highlight totals
+  },
+  table: {
+    display: 'table',
+    width: '100%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#d9d9d9', // Light grey border around the table
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#d9d9d9',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#800000', // Maroon header
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 10,
+  },
+  tableCell: {
+    flex: 1,
+    textAlign: 'center',
+    padding: 5,
+    fontSize: 10,
+  },
+  footerSection: {
+    marginTop: 'auto', // Push to bottom
+    borderTop: '2 solid #800000', // Maroon border at the top
+    paddingTop: 15,
+    backgroundColor: '#F7F9FC', // Light background for footer
+  },
+  footerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    padding: 10,
+    border: '1 solid #E6E9ED', // Light border around footer row
+    borderRadius: 5,
+  },
+  bankDetails: {
+    width: '48%',
+    fontSize: 10,
+    padding: 10,
+    backgroundColor: '#ffffff', // White background for bank details
+    border: '1 solid #D1D5DB', // Light grey border for separation
+    borderRadius: 5,
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', // Subtle shadow effect
+  },
+  totals: {
+    width: '48%',
+    fontSize: 10,
+    padding: 10,
+    backgroundColor: '#ffffff', // White background for totals
+    border: '1 solid #D1D5DB', // Light grey border for separation
+    borderRadius: 5,
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)', // Subtle shadow effect
+  },
+  signatureSection: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#F0F4F8', // Light grey for signature area
+    borderRadius: 5,
+    border: '1 solid #D1D5DB',
+    fontSize: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  qrCode: {
+    width: 60,
+    height: 60,
+  },
+  footer: {
+    textAlign: 'center',
+    fontSize: 10,
+    marginTop: 15,
+    color: '#666', // Muted footer text
+  },
 });
 
 // Invoice Component
@@ -168,23 +158,15 @@ const InvoicePrint = ({ invoiceData }) => (
     <Page style={styles.page}>
       {/* Letterhead Section */}
       <View style={styles.letterheadContainer}>
-  {/* Company Name */}
-  <Text style={styles.companyName}>Shaurya Trading Company</Text>
-
-  {/* Address and Contact Details */}
-  <Text style={styles.contactDetails}>
-   At Post Tulshi, Tal. Madha, Dist. Solapur | Email: info@abcgarments.com | Phone: +91-9876543210
-  </Text>
-
-  {/* GSTIN Number */}
-  <Text style={styles.gstin}>GSTIN: 27XXXXXXXXX9Z5</Text>
-
-  {/* Horizontal Strip with Message */}
-  <View style={styles.messageStrip}>
-    <Text style={styles.messageText}>"Delivering Quality and Trust Since 1995"</Text>
-  </View>
-</View>
-
+        <Text style={styles.companyName}>SHAURYA TRADING COMPANY</Text>
+        <Text style={styles.contactDetails}>
+          At Post Tulshi, Tal. Madha, Dist. Solapur | Email: shaurytradingcom17@gmail.com | Phone: +91-9665526332 / +91-7741056332
+        </Text>
+        <Text style={styles.gstin}>GSTIN: 27FIMPD7877K1ZE</Text>
+        <View style={styles.messageStrip}>
+          <Text style={styles.messageText}>"Delivering Quality and Trust"</Text>
+        </View>
+      </View>
 
       {/* Bill To Section */}
       <View style={styles.section}>
@@ -208,7 +190,6 @@ const InvoicePrint = ({ invoiceData }) => (
           <Text style={styles.tableCell}>Sl. No.</Text>
           <Text style={styles.tableCell}>Description</Text>
           <Text style={styles.tableCell}>Size</Text>
-
           <Text style={styles.tableCell}>Quantity</Text>
           <Text style={styles.tableCell}>Rate</Text>
           <Text style={styles.tableCell}>Amount</Text>
@@ -218,7 +199,6 @@ const InvoicePrint = ({ invoiceData }) => (
             <Text style={styles.tableCell}>{index + 1}</Text>
             <Text style={styles.tableCell}>{product.name}</Text>
             <Text style={styles.tableCell}>{product.size}</Text>
-
             <Text style={styles.tableCell}>{product.quantity}</Text>
             <Text style={styles.tableCell}>{product.rate.toFixed(2)}</Text>
             <Text style={styles.tableCell}>{product.amount.toFixed(2)}</Text>
@@ -227,52 +207,48 @@ const InvoicePrint = ({ invoiceData }) => (
       </View>
 
       {/* Footer Section */}
-    {/* Footer Section */}
-<View style={styles.footerSection}>
-  <View style={styles.footerRow}>
-    {/* Bank Details */}
-    <View style={styles.bankDetails}>
-      <Text style={styles.label}>Bank Details:</Text>
-      <Text>Bank Name: XYZ Bank</Text>
-      <Text>Account Number: 123456789012</Text>
-      <Text>IFSC Code: XYZB0000123</Text>
-    </View>
-
-    {/* Totals Section */}
-    <View style={styles.totals}>
-      <View style={styles.row}>
-        <Text style={styles.label}>Total Quantity:</Text>
-        <Text style={styles.value}>{invoiceData.totals.totalQuantity}</Text>
+      <View style={styles.footerSection}>
+        <View style={styles.footerRow}>
+          <View style={styles.bankDetails}>
+            <Text style={styles.label}>Bank Details:</Text>
+            <Text>Bank Name: State Bank of India</Text>
+            <Text>Account Number: 40474510195</Text>
+            <Text>IFSC Code: SBIN0061399</Text>
+          </View>
+          <View style={styles.totals}>
+            <View style={styles.row}>
+              <Text style={styles.label}>Total Quantity:</Text>
+              <Text style={styles.value}>{invoiceData.totals.totalQuantity}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Subtotal:</Text>
+              <Text style={styles.value}>₹{invoiceData.totals.totalAmount.toFixed(2)}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>CGST:</Text>
+              <Text style={styles.value}>₹{invoiceData.totals.cgst.toFixed(2)}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>SGST:</Text>
+              <Text style={styles.value}>₹{invoiceData.totals.sgst.toFixed(2)}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Total Amount:</Text>
+              <Text style={styles.value}>₹{invoiceData.totals.grandTotal.toFixed(2)}</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.signatureSection}>
+          <Text>Authorized Signatory:</Text>
+          <Image
+            style={styles.qrCode}
+            src="/QR.jpg"
+          />
+        </View>
+        <Text style={styles.footer}>
+          Thank you for your business!
+        </Text>
       </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>Subtotal:</Text>
-        <Text style={styles.value}>₹{invoiceData.totals.totalAmount.toFixed(2)}</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>CGST:</Text>
-        <Text style={styles.value}>₹{invoiceData.totals.cgst.toFixed(2)}</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>SGST:</Text>
-        <Text style={styles.value}>₹{invoiceData.totals.sgst.toFixed(2)}</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.label}>Grand Total:</Text>
-        <Text style={styles.value}>₹{invoiceData.totals.grandTotal.toFixed(2)}</Text>
-      </View>
-    </View>
-  </View>
-
-  {/* Signature Section */}
-  <View style={styles.signatureSection}>
-    <Text style={styles.label}>Authorized Signatory:</Text>
-    <Text>(Seal & Signature)</Text>
-  </View>
-
-  {/* Footer */}
-  <Text style={styles.footer}>Thank you for your business!</Text>
-</View>
-
     </Page>
   </Document>
 );
