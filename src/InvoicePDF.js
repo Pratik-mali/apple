@@ -1,5 +1,5 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font} from "@react-pdf/renderer";
 
 // Register the font
 Font.register({
@@ -23,6 +23,7 @@ const InvoicePDF = ({ invoiceData }) => {
     customerDetails: {
       fontSize: 8,
       textAlign: "center",
+      marginBottom:10
     },
     customerDetailsDiv: {
       marginTop: 50,
@@ -30,7 +31,7 @@ const InvoicePDF = ({ invoiceData }) => {
     table: {
       display: "table",
       width: "100%",
-      height: 160.27, // 46% of A4 page height
+      height: 195.27, // 46% of A4 page height
       borderStyle: "solid",
       borderWidth: 2,
       borderColor: "#000",
@@ -38,6 +39,7 @@ const InvoicePDF = ({ invoiceData }) => {
     },
     tableRow: {
       flexDirection: "row",
+      paddingBottom:1
     },
     tableCellHeader: {
       paddingLeft: 5,
@@ -46,6 +48,7 @@ const InvoicePDF = ({ invoiceData }) => {
       borderRightWidth: 1,
       borderBottomWidth: 1,
       borderColor: "#000",
+      padding:5
     },
     tableCell: {
       paddingLeft: 5,
@@ -80,7 +83,7 @@ const InvoicePDF = ({ invoiceData }) => {
       width: "40%",
       marginLeft: "auto",
       padding: 5,
-      marginTop: 8,
+      marginTop: -10,
       borderWidth: 1,
       borderColor: "#000",
     },
@@ -204,7 +207,7 @@ const InvoicePDF = ({ invoiceData }) => {
 
         {/* Totals Section */}
        {/* Totals Section and QR Code */ }
-<View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 8 }}>
+<View style={{ marginTop: 8 }}>
   {/* Totals Summary */}
   <View style={[styles.summaryContainer, { width: "50%" }]}>
     {invoiceData.totals?.finalAmount !== undefined && (
@@ -234,12 +237,7 @@ const InvoicePDF = ({ invoiceData }) => {
   </View>
 
   {/* QR Code */}
-  <View style={{ width: "40%", alignItems: "center", justifyContent: "center" }}>
-    <Image
-      style={{ width: 100, height: 100 }}
-      src={'/QR.JPG'}
-    />
-  </View>
+
 </View>
 
       </Page>
