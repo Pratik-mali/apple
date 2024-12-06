@@ -518,10 +518,11 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
               <th style={{ border: "1px solid #ddd", padding: "8px" }}>
                 Product Name
               </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Price</th>
+            
               <th style={{ border: "1px solid #ddd", padding: "8px" }}>
                 Quantity
               </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Price</th>
               <th style={{ border: "1px solid #ddd", padding: "8px" }}>
                 Discount
               </th>
@@ -607,14 +608,15 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
 
 
 
+                
                 <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                   <input
                     type="number"
-                    value={field.price}
+                    value={field.quantity}
                     onChange={(e) =>
-                      handleFieldChange(index, "price", e.target.value)
+                      handleFieldChange(index, "quantity", e.target.value)
                     }
-                    ref={(el) => (inputRefs.current[index * 4 + 1] = el)}
+                    ref={(el) => (inputRefs.current[index * 4 + 2] = el)}
                     style={{
                       width: "100%",
                       padding: "5px",
@@ -626,11 +628,11 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
                 <td style={{ padding: "8px", border: "1px solid #ddd" }}>
                   <input
                     type="number"
-                    value={field.quantity}
+                    value={field.price}
                     onChange={(e) =>
-                      handleFieldChange(index, "quantity", e.target.value)
+                      handleFieldChange(index, "price", e.target.value)
                     }
-                    ref={(el) => (inputRefs.current[index * 4 + 2] = el)}
+                    ref={(el) => (inputRefs.current[index * 4 + 1] = el)}
                     style={{
                       width: "100%",
                       padding: "5px",

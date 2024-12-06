@@ -25,6 +25,9 @@ const Sidebar = ({ setActiveComponent }) => {
       <button style={styles.button} onClick={() => setActiveComponent("PurchaseList")}>
         Purchase List
       </button>
+      <button style={styles.button} onClick={() => setActiveComponent("ManagePayments")}>
+        Purchase Payment
+      </button>
     </div>
   );
 };

@@ -27,6 +27,8 @@ const InvoicePDF = ({ invoiceData }) => {
     },
     customerDetailsDiv: {
       marginTop: 50,
+      fontFamily: "Tiro Marathi",
+
     },
     table: {
       display: "table",

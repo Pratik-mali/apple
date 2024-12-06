@@ -34,7 +34,78 @@ const InvoiceGenerator = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [activeSuggestion, setActiveSuggestion] = useState(-1); // For keyboard navigation
   
-
+  const [partyInfo, setPartyInfo] = useState({ name: '', address: '', gstin: '' });
+  const [partySuggestions, setPartySuggestions] = useState([]);
+  const [showPartySuggestions, setShowPartySuggestions] = useState(false);
+  const [activePartySuggestion, setActivePartySuggestion] = useState(-1);
+  const handlePartyChange = async (field, value) => {
+    const updatedPartyInfo = { ...partyInfo, [field]: value };
+    setPartyInfo(updatedPartyInfo);
+  
+    if (field === 'name' && value.trim()) {
+      const invoicesRef = collection(db, 'PurchaseInvoices');
+      const querySnapshot = await getDocs(
+        query(
+          invoicesRef,
+          where('partyDetails.name', '>=', value),
+          where('partyDetails.name', '<=', value + '\uf8ff')
+        )
+      );
+  
+      const suggestions = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data().partyDetails,
+      }));
+  
+      // Filter unique names
+      const uniqueSuggestions = suggestions.reduce((acc, current) => {
+        if (!acc.some((item) => item.name === current.name)) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+  
+      setPartySuggestions(uniqueSuggestions);
+      setShowPartySuggestions(true);
+    } else if (field === 'name') {
+      setPartySuggestions([]);
+      setShowPartySuggestions(false);
+    }
+  };
+  
+  const handleSelectParty = (party) => {
+    setPartyInfo({
+      name: party.name,
+      address: party.address,
+      gstin: party.gstin,
+    });
+    setPartySuggestions([]);
+    setShowPartySuggestions(false);
+  };
+  const handlePartyKeyDown = (e) => {
+    if (e.key === 'ArrowDown') {
+      setActivePartySuggestion((prev) => Math.min(prev + 1, partySuggestions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      setActivePartySuggestion((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter' && activePartySuggestion !== -1) {
+      handleSelectParty(partySuggestions[activePartySuggestion]);
+    }
+  };
+  const handlePartyBlur = async () => {
+    if (!partyInfo.name.trim()) return;
+  
+    const invoicesRef = collection(db, 'PurchaseInvoices');
+    const querySnapshot = await getDocs(
+      query(invoicesRef, where('partyDetails.name', '==', partyInfo.name))
+    );
+  
+    if (!querySnapshot.empty) {
+      const selectedParty = querySnapshot.docs[0].data().partyDetails;
+      handleSelectParty(selectedParty);
+    }
+    setShowPartySuggestions(false);
+  };
+          
 
   useEffect(() => {
     const fetchLastInvoiceNumber = async () => {
@@ -178,10 +249,10 @@ const handleKeyDown = (event, index) => {
 
       // Prepare invoice data
       const invoiceData = {
+        partyDetails: partyInfo, // Include this
         invoiceNumber,
         invoiceDate,
         state,
-        partyDetails,
         products: filteredProducts,
         cgstRate,
         sgstRate,
@@ -284,28 +355,82 @@ const handleKeyDown = (event, index) => {
         style={styles.input}
       />
       {/* Party details */}
-      <label style={styles.label}>Party Details</label>
-      <input
-        type="text"
-        placeholder="Party Name"
-        value={partyDetails.name}
-        onChange={(e) => setPartyDetails({ ...partyDetails, name: e.target.value })}
-        style={styles.input}
-      />
-      <input
-        type="text"
-        placeholder="Address"
-        value={partyDetails.address}
-        onChange={(e) => setPartyDetails({ ...partyDetails, address: e.target.value })}
-        style={styles.input}
-      />
-      <input
-        type="text"
-        placeholder="GSTIN"
-        value={partyDetails.gstin}
-        onChange={(e) => setPartyDetails({ ...partyDetails, gstin: e.target.value })}
-        style={styles.input}
-      />
+      <label style={{ fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Party Details</label>
+<input
+  type="text"
+  placeholder="Party Name"
+  value={partyInfo.name}
+  onChange={(e) => handlePartyChange('name', e.target.value)}
+  onKeyDown={handlePartyKeyDown}
+  onBlur={handlePartyBlur}
+  style={{
+    marginBottom: '10px',
+    padding: '8px',
+    width: '100%',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    boxSizing: 'border-box',
+  }}
+/>
+{showPartySuggestions && partySuggestions.length > 0 && (
+  <ul
+    style={{
+      listStyle: 'none',
+      margin: 0,
+      padding: 0,
+      position: 'absolute',
+      zIndex: 10,
+      backgroundColor: '#fff',
+      border: '1px solid #ccc',
+      width: '100%',
+      maxHeight: '150px',
+      overflowY: 'auto',
+    }}
+  >
+    {partySuggestions.map((party, idx) => (
+      <li
+        key={party.id}
+        onClick={() => handleSelectParty(party)}
+        style={{
+          padding: '10px',
+          cursor: 'pointer',
+          backgroundColor: idx === activePartySuggestion ? '#f0f0f0' : 'transparent',
+        }}
+      >
+        {party.name} - {party.address}
+      </li>
+    ))}
+  </ul>
+)}
+<input
+  type="text"
+  placeholder="Address"
+  value={partyInfo.address}
+  onChange={(e) => handlePartyChange('address', e.target.value)}
+  style={{
+    marginBottom: '10px',
+    padding: '8px',
+    width: '100%',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    boxSizing: 'border-box',
+  }}
+/>
+<input
+  type="text"
+  placeholder="GSTIN"
+  value={partyInfo.gstin}
+  onChange={(e) => handlePartyChange('gstin', e.target.value)}
+  style={{
+    marginBottom: '10px',
+    padding: '8px',
+    width: '100%',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    boxSizing: 'border-box',
+  }}
+/>
+
       {/* Products Table */}
       <table style={styles.table}>
         <thead>

@@ -8,6 +8,7 @@ import InvoiceList from "./InvoiceList";
 import CustomerComponent from "./CustomerComponent";
 import InvoiceGenerator from "./InvoiceGenerator";
 import PurchaseList from "./PurchaseList";
+import ManagePayments from "./ManagePayments";
 // import Customers from "./Customers";
 // import Reports from "./Reports";
 
@@ -33,6 +34,9 @@ const Dashboard = () => {
 
           case "PurchaseList":
           return <PurchaseList />
+
+          case "ManagePayments":
+            return <ManagePayments />
       default:
         return <Inventory />;
     }
