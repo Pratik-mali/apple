@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
 import ReactPDF from '@react-pdf/renderer';
+import { where} from "firebase/firestore";
+
 import {
   collection,
   query,
@@ -28,6 +30,12 @@ const InvoiceGenerator = () => {
   const [sgstRate, setSgstRate] = useState(2.5);
   const [igstRate, setIgstRate] = useState(0);
 
+
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1); // For keyboard navigation
+  
+
+
   useEffect(() => {
     const fetchLastInvoiceNumber = async () => {
       const q = query(collection(db, 'PurchaseInvoices'), orderBy('invoiceNumber', 'desc'), limit(1));
@@ -42,25 +50,90 @@ const InvoiceGenerator = () => {
     fetchLastInvoiceNumber();
   }, []);
 
-  const handleProductChange = (index, field, value) => {
+  const handleProductChange = async (index, field, value) => {
+  const updatedProducts = [...products];
+  
+  // Update the field value, converting to number if necessary
+  updatedProducts[index][field] = field === 'quantity' || field === 'rate' ? Number(value) : value;
+
+  // Calculate the amount for the row
+  if (field === 'quantity' || field === 'rate') {
+    updatedProducts[index].amount = updatedProducts[index].quantity * updatedProducts[index].rate;
+  }
+
+  setProducts(updatedProducts);
+
+  // Automatically add a new row if the last row is completely filled
+  const isRowFilled = (row) =>
+    row.name.trim() && row.size.trim() && row.quantity > 0 && row.rate > 0;
+
+  if (isRowFilled(updatedProducts[index]) && index === updatedProducts.length - 1) {
+    handleAddProduct();
+  }
+
+  // Handle fetching suggestions if the field is 'name'
+  if (field === 'name') {
+    const fetchSuggestions = async (queryText) => {
+      if (!queryText.trim()) {
+        setSuggestions([]);
+        return;
+      }
+
+      const productsRef = collection(db, 'products');
+      const q = query(
+        productsRef,
+        where('transliteratedName', '>=', queryText),
+        where('transliteratedName', '<=', queryText + '\uf8ff')
+      );
+
+      const snapshot = await getDocs(q);
+      const fetchedProducts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setSuggestions(fetchedProducts);
+    };
+
+    fetchSuggestions(value.trim());
+  }
+
+  // Handle fetching and setting product details by code on blur
+  if (field === 'name' && value.trim() === updatedProducts[index].name.trim()) {
+    const fetchProductByCode = async (code) => {
+      const productsRef = collection(db, 'products');
+      const q = query(productsRef, where('productCode', '==', code.trim()));
+
+      const snapshot = await getDocs(q);
+      if (!snapshot.empty) {
+        const product = snapshot.docs[0].data();
+        updatedProducts[index].name = product.productName;
+        updatedProducts[index].size = product.productUnit; // Optional: update size
+        setProducts(updatedProducts);
+      }
+    };
+
+    fetchProductByCode(value.trim());
+  }
+};
+
+const handleKeyDown = (event, index) => {
+  if (event.key === 'ArrowDown') {
+    setActiveSuggestion((prev) => Math.min(prev + 1, suggestions.length - 1));
+  } else if (event.key === 'ArrowUp') {
+    setActiveSuggestion((prev) => Math.max(prev - 1, 0));
+  } else if (event.key === 'Enter' && activeSuggestion !== -1) {
+    const selectedProduct = suggestions[activeSuggestion];
     const updatedProducts = [...products];
-    updatedProducts[index][field] = field === 'quantity' || field === 'rate' ? Number(value) : value;
 
-    // Calculate the amount for the row
-    if (field === 'quantity' || field === 'rate') {
-      updatedProducts[index].amount = updatedProducts[index].quantity * updatedProducts[index].rate;
-    }
-
+    updatedProducts[index].name = selectedProduct.productName;
+    updatedProducts[index].size = selectedProduct.productUnit; // Optional: update size
     setProducts(updatedProducts);
 
-    // Automatically add a new row if the last row is completely filled
-    const isRowFilled = (row) =>
-      row.name.trim() && row.size.trim() && row.quantity > 0 && row.rate > 0;
-
-    if (isRowFilled(updatedProducts[index]) && index === updatedProducts.length - 1) {
-      handleAddProduct();
-    }
-  };
+    setSuggestions([]); // Clear suggestions
+    setActiveSuggestion(-1); // Reset active suggestion
+  }
+};
 
   const handleAddProduct = () => {
     setProducts([...products, { name: '', size: '', quantity: 0, rate: 0, amount: 0 }]);
@@ -249,12 +322,39 @@ const InvoiceGenerator = () => {
           {products.map((product, index) => (
             <tr key={index}>
               <td style={styles.tableCell}>
-                <input
-                  type="text"
-                  value={product.name}
-                  onChange={(e) => handleProductChange(index, 'name', e.target.value)}
-                  style={styles.input}
-                />
+              <input
+  type="text"
+  value={product.name}
+  onChange={(e) => handleProductChange(index, 'name', e.target.value)}
+  onBlur={(e) => handleProductChange(index, 'name', e.target.value)} // Automatically fetch by code on blur
+  onKeyDown={(e) => handleKeyDown(e, index)} // Handle keyboard navigation
+  style={styles.input}
+/>
+{suggestions.length > 0 && (
+  <ul style={styles.dropdown}>
+    {suggestions.map((prod, idx) => (
+      <li
+        key={prod.id}
+        onClick={() => {
+          const updatedProducts = [...products];
+          updatedProducts[index].name = prod.productName;
+          setProducts(updatedProducts);
+
+          setSuggestions([]);
+        }}
+        style={{
+          ...styles.dropdownItem,
+          backgroundColor: idx === activeSuggestion ? "#f0f0f0" : "transparent",
+        }}
+      >
+        {prod.productName} ({prod.productCode})
+      </li>
+    ))}
+  </ul>
+)}
+
+
+
               </td>
               <td style={styles.tableCell}>
                 <input

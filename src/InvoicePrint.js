@@ -1,5 +1,10 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Image, Font } from '@react-pdf/renderer';
+
+Font.register({
+  family: "Tiro Marathi",
+  src: "./TiroDevanagariMarathi-Regular.ttf", // Adjust the path as per your project structure
+});
 
 // Styling
 const styles = StyleSheet.create({
@@ -97,6 +102,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 5,
     fontSize: 10,
+  },
+
+  tableCell1: {
+    flex: 1,
+    textAlign: 'center',
+    padding: 5,
+    fontSize: 10,
+    fontFamily: "Tiro Marathi",
+
   },
   footerSection: {
     marginTop: 'auto', // Push to bottom
@@ -197,7 +211,7 @@ const InvoicePrint = ({ invoiceData }) => (
         {invoiceData.products.map((product, index) => (
           <View key={index} style={styles.tableRow}>
             <Text style={styles.tableCell}>{index + 1}</Text>
-            <Text style={styles.tableCell}>{product.name}</Text>
+            <Text style={styles.tableCell1}>{product.name}</Text>
             <Text style={styles.tableCell}>{product.size}</Text>
             <Text style={styles.tableCell}>{product.quantity}</Text>
             <Text style={styles.tableCell}>{product.rate.toFixed(2)}</Text>
