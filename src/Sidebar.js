@@ -13,9 +13,7 @@ const Sidebar = ({ setActiveComponent }) => {
       <button style={styles.button} onClick={() => setActiveComponent("Customers")}>
         Customers
       </button>
-      <button style={styles.button} onClick={() => setActiveComponent("Reports")}>
-        Reports
-      </button>
+     
       <button style={styles.button} onClick={() => setActiveComponent("InvoiceList")}>
         Invoice List
       </button>
@@ -27,6 +25,12 @@ const Sidebar = ({ setActiveComponent }) => {
       </button>
       <button style={styles.button} onClick={() => setActiveComponent("ManagePayments")}>
         Purchase Payment
+      </button>
+      <button style={styles.button} onClick={() => setActiveComponent("GSTGenerator")}>
+        GST Billing
+      </button>
+      <button style={styles.button} onClick={() => setActiveComponent("GSTList")}>
+        GST Invoices
       </button>
     </div>
   );

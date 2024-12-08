@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { db } from "./firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { PDFDownloadLink } from "@react-pdf/renderer"; // Import PDFDownloadLink
 import InvoicePDF from "./InvoicePDF"; // Import your InvoicePDF component
 
@@ -9,6 +9,8 @@ const InvoiceDetails = () => {
   const { invoiceId } = useParams();
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchInvoiceDetails = async () => {
@@ -102,6 +104,20 @@ const InvoiceDetails = () => {
 
       {/* Print Invoice Button */}
       <div style={{ marginTop: "20px" }}>
+      <button
+        onClick={() => navigate("/Dashboard")} // Redirect to the homepage or another route
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#DC3545",
+          color: "#FFF",
+          textDecoration: "none",
+          borderRadius: "5px",
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Close
+      </button>
         <PDFDownloadLink
           document={<InvoicePDF invoiceData={invoice} />}
           fileName={`Invoice-${invoiceId}.pdf`}

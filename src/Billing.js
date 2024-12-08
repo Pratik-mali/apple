@@ -233,7 +233,6 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
   };
   
 
-  
   const handleStoreInvoice = async () => {
     try {
       // Prepare invoice data
@@ -266,20 +265,75 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
   
       // Save invoice to Firestore
       const invoiceRef = await addDoc(collection(db, "invoices"), invoiceData);
-  
       alert(`Invoice stored successfully with ID: ${invoiceRef.id}`);
+      resetForm();
   
       // Generate PDF
       const pdfDoc = pdf(<InvoicePDF invoiceData={invoiceData} />);
       const blob = await pdfDoc.toBlob();
   
-      // Download the PDF
-      saveAs(blob, `invoice_${invoiceRef.id}.pdf`);
+      // Open a temporary window
+      const printWindow = window.open("", "_blank", "width=800,height=600");
+      if (printWindow) {
+        const pdfUrl = URL.createObjectURL(blob);
+  
+        // Write the iframe HTML
+        printWindow.document.write(`
+          <html>
+            <head><title>Print Invoice</title></head>
+            <body style="margin: 0; padding: 0;">
+              <iframe id="printFrame" 
+                      src="${pdfUrl}" 
+                      style="width:100%;height:100%;border:none;" 
+                      frameborder="0">
+              </iframe>
+            </body>
+          </html>
+        `);
+  
+        // Wait for the iframe to load
+        printWindow.document.close();
+        const iframe = printWindow.document.getElementById("printFrame");
+  
+        iframe.onload = () => {
+          const iframeWindow = iframe.contentWindow || iframe;
+  
+          // Attach an event listener to detect after printing
+          iframeWindow.onafterprint = () => {
+            printWindow.close();
+          };
+  
+          // Trigger printing
+          iframeWindow.focus();
+          iframeWindow.print();
+        };
+      }
     } catch (error) {
       console.error("Error storing invoice: ", error);
       alert("Failed to store invoice. Please try again.");
     }
   };
+  
+  
+  
+  
+  const resetForm = () => {
+    setFormFields([{ productName: "", price: "", quantity: "", discount: "" }]);
+    setSelectedCustomer("");
+    setIsNewCustomer(false);
+    setFilteredCustomers([]);
+    setHighlightedCustomerIndex(-1);
+    setFilteredProducts([]);
+    setHighlightedProductIndex(-1);
+    setPaidAmount("");
+    setFocusedIndex(-1);
+    setContactNumber("");
+    setAddress("");
+    setOutstandingAmount(0);
+    inputRefs.current = []; // Reset input references if used
+  };
+  
+  
   
   useEffect(() => {
     // Check if the last row is fully filled
