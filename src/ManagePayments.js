@@ -30,7 +30,7 @@ const ManagePayments = () => {
       // Summing up total amounts from invoices
       invoiceSnapshot.forEach((doc) => {
         const party = doc.data().partyDetails;
-        const totalAmount = doc.data().totals?.totalAmount || 0;
+        const totalAmount = doc.data().totals?.grandTotal || 0;
 
         if (!uniqueParties[party.name]) {
           uniqueParties[party.name] = {
