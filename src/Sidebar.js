@@ -32,6 +32,9 @@ const Sidebar = ({ setActiveComponent }) => {
       <button style={styles.button} onClick={() => setActiveComponent("GSTList")}>
         GST Invoices
       </button>
+      <button style={styles.button} onClick={() => setActiveComponent("ReportsComponent")}>
+       Purchase Report
+      </button>
     </div>
   );
 };

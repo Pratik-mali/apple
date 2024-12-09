@@ -29,6 +29,7 @@ const InvoiceGenerator = () => {
   const [cgstRate, setCgstRate] = useState(2.5);
   const [sgstRate, setSgstRate] = useState(2.5);
   const [igstRate, setIgstRate] = useState(0);
+  const [roundOff, setRoundOff] = useState(0);
 
 
   const [suggestions, setSuggestions] = useState([]);
@@ -128,10 +129,12 @@ const InvoiceGenerator = () => {
   updatedProducts[index][field] = field === 'quantity' || field === 'rate' ? Number(value) : value;
 
   // Calculate the amount for the row
-  if (field === 'quantity' || field === 'rate') {
-    updatedProducts[index].amount = updatedProducts[index].quantity * updatedProducts[index].rate;
+  if (field === 'quantity' || field === 'rate' || field === 'discount') {
+    const discountRate = updatedProducts[index].discount || 0;
+    const grossAmount = updatedProducts[index].quantity * updatedProducts[index].rate;
+    updatedProducts[index].amount = grossAmount - (grossAmount * discountRate) / 100;
   }
-
+  
   setProducts(updatedProducts);
 
   // Automatically add a new row if the last row is completely filled
@@ -205,9 +208,40 @@ const handleKeyDown = (event, index) => {
     setActiveSuggestion(-1); // Reset active suggestion
   }
 };
+const resetForm = () => {
+  setInvoiceNumber(''); // Or set it to the new invoice number after fetching the last one
+  setInvoiceDate(new Date().toISOString().slice(0, 10)); // Reset to today's date
+  setState('Maharashtra'); // Reset state field
+
+  // Reset party info
+  setPartyInfo({
+    name: '',
+    address: '',
+    gstin: '',
+  });
+
+  // Reset products list to initial state
+  setProducts([{ name: '', size: '', quantity: 0, rate: 0, discount: 0, amount: 0 }]);
+
+  // Reset discount and tax rates
+  setCgstRate(2.5);
+  setSgstRate(2.5);
+  setIgstRate(0);
+
+  // Reset roundOff
+  setRoundOff(0);
+
+  // Reset suggestions and active selection
+  setSuggestions([]);
+  setActiveSuggestion(-1);
+  setPartySuggestions([]);
+  setActivePartySuggestion(-1);
+};
+
 
   const handleAddProduct = () => {
-    setProducts([...products, { name: '', size: '', quantity: 0, rate: 0, amount: 0 }]);
+    setProducts([...products, { name: '', size: '', quantity: 0, rate: 0, discount: 0, amount: 0 }
+]);
   };
 
   const handleRemoveProduct = (index) => {
@@ -216,22 +250,37 @@ const handleKeyDown = (event, index) => {
   };
 
   const calculateTotals = () => {
-    const totalQuantity = products.reduce((acc, product) => acc + product.quantity, 0);
-    const totalAmount = products.reduce((acc, product) => acc + product.amount, 0);
+    const totalWithoutDiscount = products.reduce(
+      (acc, product) => acc + product.quantity * product.rate,
+      0
+    );
+  
+    const totalDiscount = products.reduce(
+      (acc, product) =>
+        acc + (product.quantity * product.rate * (product.discount || 0)) / 100,
+      0
+    );
+  
+    const totalAmount = totalWithoutDiscount - totalDiscount;
     const cgst = totalAmount * (cgstRate / 100);
     const sgst = totalAmount * (sgstRate / 100);
     const igst = totalAmount * (igstRate / 100);
     const totalTax = cgst + sgst + igst;
+  
     return {
-      totalQuantity,
+      totalQuantity: products.reduce((acc, product) => acc + product.quantity, 0),
+      totalWithoutDiscount,
+      totalDiscount,
       totalAmount,
       cgst,
       sgst,
       igst,
       totalTax,
-      grandTotal: totalAmount + totalTax,
+      grandTotal: totalAmount + totalTax + roundOff, // Include manual round-off
     };
   };
+  
+  
 
   const handleSaveInvoice = async () => {
     try {
@@ -273,6 +322,7 @@ const handleKeyDown = (event, index) => {
       link.click();
 
       alert('Invoice saved successfully and downloaded!');
+      resetForm();
     } catch (error) {
       console.error('Error saving or printing invoice:', error);
       alert('Failed to save or print the invoice. Please try again.');
@@ -339,7 +389,13 @@ const handleKeyDown = (event, index) => {
       <h1 style={styles.header}>Purchase Invoice Generator</h1>
       {/* Invoice details */}
       <label style={styles.label}>Invoice Number</label>
-      <input type="text" value={invoiceNumber} readOnly style={styles.input} />
+<input
+  type="text"
+  value={invoiceNumber}
+  onChange={(e) => setInvoiceNumber(e.target.value)}
+  style={styles.input}
+/>
+
       <label style={styles.label}>Invoice Date</label>
       <input
         type="date"
@@ -439,8 +495,12 @@ const handleKeyDown = (event, index) => {
             <th style={styles.tableCell}>Size</th>
             <th style={styles.tableCell}>Quantity</th>
             <th style={styles.tableCell}>Rate</th>
+            <th style={styles.tableCell}>Discount (%)</th>
+
             <th style={styles.tableCell}>Amount</th>
+
             <th style={styles.tableCell}>Actions</th>
+
           </tr>
         </thead>
         <tbody>
@@ -505,7 +565,17 @@ const handleKeyDown = (event, index) => {
                   style={styles.input}
                 />
               </td>
+
+              <td style={styles.tableCell}>
+  <input
+    type="number"
+    value={product.discount}
+    onChange={(e) => handleProductChange(index, 'discount', e.target.value)}
+    style={styles.input}
+  />
+</td>
               <td style={styles.tableCell}>{product.amount.toFixed(2)}</td>
+
               <td style={styles.tableCell}>
                 <button onClick={() => handleRemoveProduct(index)} style={styles.button}>
                   Remove
@@ -541,16 +611,30 @@ const handleKeyDown = (event, index) => {
           onChange={(e) => setIgstRate(Number(e.target.value))}
           style={styles.input}
         />
+        <label style={styles.label}>Round Off</label>
+<input
+  type="number"
+  value={roundOff}
+  onChange={(e) => setRoundOff(Number(e.target.value))}
+  style={styles.input}
+/>
+
       </div>
       {/* Totals */}
       <div>
-        <p>Total Quantity: {totals.totalQuantity}</p>
-        <p>Total Amount: ₹{totals.totalAmount.toFixed(2)}</p>
-        <p>CGST: ₹{totals.cgst.toFixed(2)}</p>
-        <p>SGST: ₹{totals.sgst.toFixed(2)}</p>
-        <p>IGST: ₹{totals.igst.toFixed(2)}</p>
-        <p>Total Tax: ₹{totals.totalTax.toFixed(2)}</p>
-        <h3>Grand Total: ₹{totals.grandTotal.toFixed(2)}</h3>
+      <div>
+  <p>Total Without Discount: ₹{totals.totalWithoutDiscount.toFixed(2)}</p>
+  <p>Total Discount: ₹{totals.totalDiscount.toFixed(2)}</p>
+  <p>Net Total (After Discount): ₹{totals.totalAmount.toFixed(2)}</p>
+  <p>CGST: ₹{totals.cgst.toFixed(2)}</p>
+  <p>SGST: ₹{totals.sgst.toFixed(2)}</p>
+  <p>IGST: ₹{totals.igst.toFixed(2)}</p>
+  <p>Total Tax: ₹{totals.totalTax.toFixed(2)}</p>
+  <p>Round Off: ₹{roundOff.toFixed(2)}</p>
+  <h3>Grand Total: ₹{totals.grandTotal.toFixed(2)}</h3>
+</div>
+
+
       </div>
       <button onClick={handleSaveInvoice} style={styles.button}>
         Save Invoice
