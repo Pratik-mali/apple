@@ -3,6 +3,7 @@ import { db } from './firebase';
 import ReactPDF from '@react-pdf/renderer';
 import { where} from "firebase/firestore";
 
+
 import {
   collection,
   query,
@@ -10,11 +11,30 @@ import {
   limit,
   getDocs,
   addDoc,
+  updateDoc, doc
 } from 'firebase/firestore';
 
-import InvoicePrint from './InvoicePrint';
 
-const InvoiceGenerator = () => {
+const InvoiceGenerator = ({ editInvoice, isEditMode, onReset }) => {
+
+
+  useEffect(() => {
+    if (isEditMode && editInvoice) {
+      // Populate form with selected record data
+      setInvoiceNumber(editInvoice.invoiceNumber);
+      setInvoiceDate(editInvoice.invoiceDate);
+      setPartyInfo(editInvoice.partyDetails);
+      setProducts(editInvoice.products || []);
+      setCgstRate(editInvoice.cgstRate || 2.5);
+      setSgstRate(editInvoice.sgstRate || 2.5);
+      setIgstRate(editInvoice.igstRate || 0);
+      setRoundOff(editInvoice.totals?.roundOff || 0);
+    }
+  }, [editInvoice, isEditMode]);
+
+
+
+
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().slice(0, 10));
   const [state, setState] = useState('Maharashtra');
@@ -114,7 +134,7 @@ const InvoiceGenerator = () => {
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         const lastInvoice = querySnapshot.docs[0].data();
-        setInvoiceNumber(lastInvoice.invoiceNumber + 1);
+        setInvoiceNumber(0);
       } else {
         setInvoiceNumber(1);
       }
@@ -276,6 +296,7 @@ const resetForm = () => {
       sgst,
       igst,
       totalTax,
+      roundOff,
       grandTotal: totalAmount + totalTax + roundOff, // Include manual round-off
     };
   };
@@ -284,48 +305,33 @@ const resetForm = () => {
 
   const handleSaveInvoice = async () => {
     try {
-      // Filter out empty rows
-      const filteredProducts = products.filter(
-        (product) =>
-          product.name.trim() &&
-          product.size.trim() &&
-          product.quantity > 0 &&
-          product.rate > 0
-      );
-
-      // Calculate totals
-      const totals = calculateTotals();
-
-      // Prepare invoice data
       const invoiceData = {
-        partyDetails: partyInfo, // Include this
+        partyDetails: partyInfo,
         invoiceNumber,
         invoiceDate,
         state,
-        products: filteredProducts,
+        products,
         cgstRate,
         sgstRate,
         igstRate,
-        totals,
+        totals: calculateTotals(),
       };
 
-      // Save the invoice to Firestore
-      await addDoc(collection(db, 'PurchaseInvoices'), invoiceData);
+      if (isEditMode && editInvoice?.id) {
+        // Update the existing invoice
+        await updateDoc(doc(db, 'PurchaseInvoices', editInvoice.id), invoiceData);
+        alert('Invoice updated successfully!');
+      } else {
+        // Create a new invoice
+        await addDoc(collection(db, 'PurchaseInvoices'), invoiceData);
+        alert('Invoice saved successfully!');
+      }
 
-      // Generate the PDF using ReactPDF
-      const pdfBlob = await ReactPDF.pdf(<InvoicePrint invoiceData={invoiceData} />).toBlob();
-
-      // Create a downloadable file for the user
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(pdfBlob);
-      link.download = `Invoice-${invoiceData.invoiceNumber}.pdf`;
-      link.click();
-
-      alert('Invoice saved successfully and downloaded!');
       resetForm();
+      onReset(); // Notify parent to reset state
     } catch (error) {
-      console.error('Error saving or printing invoice:', error);
-      alert('Failed to save or print the invoice. Please try again.');
+      console.error('Error saving invoice:', error);
+      alert('Failed to save the invoice.');
     }
   };
 
