@@ -3,11 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@fontsource/tiro-devanagari-marathi": "^5.0.13",
     "@formatjs/intl-relativetimeformat": "^11.2.14",
     "@fortawesome/fontawesome-free": "^6.5.2",
     "@google-cloud/translate": "^8.3.0",
     "@indic-transliteration/sanscript": "^1.3.1",
+    "@mui/icons-material": "^6.1.10",
+    "@mui/material": "^6.1.10",
     "@pdf-lib/fontkit": "^1.1.1",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
@@ -86,9 +90,5 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "gh-pages": "^6.1.1"
   },
-
-
-"homepage": "/"
-
-  
+  "homepage": "/"
 }

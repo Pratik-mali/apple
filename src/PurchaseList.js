@@ -134,162 +134,75 @@ const PurchaseList = () => {
   };
 
   return (
-    <div>
+    <div style={styles.container}>
       <style>
         {`
-         .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
+          /* Global Modal Styles */
+          .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+          }
 
-    .modal-content {
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 800px;
-      max-height: 90%;
-      overflow-y: auto;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      animation: fadeIn 0.3s ease-in-out;
-    }
+          .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 85%;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease-in-out;
+          }
 
-    .modal-close-btn {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #ff4d4d;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
+          .modal-close-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+          }
 
-    .modal-close-btn:hover {
-      background: #ff1a1a;
-    }
+          .modal-close-btn:hover {
+            background: #ff1a1a;
+          }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    /* Table Styling */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background-color: #f9f9f9;
-    }
-
-    table th,
-    table td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-    }
-
-    table th {
-      background: #007bff;
-      color: white;
-      font-weight: bold;
-    }
-
-    table tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    table tr:hover {
-      background-color: #e6f7ff;
-    }
-
-    /* Input Field Styling */
-    input[type="text"],
-    input[type="date"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-
-    input[type="text"]:focus,
-    input[type="date"]:focus {
-      outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    }
-
-    /* Button Styling */
-    button {
-      padding: 10px 20px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s ease;
-      
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    button:disabled {
-      background: #cccccc;
-      cursor: not-allowed;
-    }
-
-    /* Table Actions Button */
-    .table-actions button {
-      margin-right: 5px;
-    }
-
-    /* Header */
-    h1 {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      color: #333;
-      margin-bottom: 20px;
-    }
-
-    /* Utility */
-    .text-center {
-      text-align: center;
-    }
-
-    .text-right {
-      text-align: right;
-    }
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: scale(0.9);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
         `}
       </style>
 
-      <h1>Purchase Records</h1>
+      <h1 style={styles.heading}>Purchase Records</h1>
       <input
         type="text"
         placeholder="Search by party name"
         value={searchQuery}
         onChange={(e) => handleSearch(e.target.value)}
+        style={styles.searchInput}
       />
-      <table>
+
+<div style={{ width: "100%", height: "400px", overflowY: "auto", border: "1px solid #ddd" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: "#f9f9f9" }}>
         <thead>
           <tr>
             <th>Invoice Number</th>
@@ -306,27 +219,67 @@ const PurchaseList = () => {
               <td>{record.invoiceDate}</td>
               <td>{record.partyDetails.name}</td>
               <td>₹{record.totals.grandTotal.toFixed(2)}</td>
-              <td>
-                <button onClick={() => handleViewDetails(record)}>View Details</button>
-                <button onClick={() => handleEditInvoice(record)}>Edit</button>
-                <button  className="modal-close-btn" onClick={() => handleDelete(record.id)}>Delete</button>
-
+              <td style={{ display: "flex", justifyContent: "space-between", padding: "10px" }}>
+                <button
+                  style={{
+                    padding: "5px 10px",
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    border: "none",
+                    cursor: "pointer",
+                    borderRadius: "5px",
+                  }}
+                  onClick={() => handleViewDetails(record)}
+                >
+                  View
+                </button>
+                <button
+                  style={{
+                    padding: "5px 10px",
+                    backgroundColor: "#28a745",
+                    color: "white",
+                    border: "none",
+                    cursor: "pointer",
+                    borderRadius: "5px",
+                  }}
+                  onClick={() => handleEditInvoice(record)}
+                >
+                  Edit
+                </button>
+                <button
+                  style={{
+                    padding: "5px 10px",
+                    backgroundColor: "#dc3545",
+                    color: "white",
+                    border: "none",
+                    cursor: "pointer",
+                    borderRadius: "5px",
+                  }}
+                  onClick={() => handleDelete(record.id)}
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button onClick={handleNextPage} disabled={loading}>
-        {loading ? 'Loading...' : 'Next'}
-      </button>
-      <button onClick={handleCreateInvoice}>New Invoice</button>
+    </div>
+      <div style={styles.footerButtons}>
+        <button onClick={handleNextPage} disabled={false} style={styles.navButton}>
+          Next
+        </button>
+        <button onClick={handleCreateInvoice} style={styles.createButton}>
+          New Invoice
+        </button>
+      </div>
 
       {/* View Modal */}
       {isViewModalOpen && selectedRecord && (
-         <div className="modal">
-         <div className="modal-content">
-           <h2>Invoice Details</h2>
-           <p><strong>Invoice Number:</strong> {selectedRecord.invoiceNumber || 'N/A'}</p>
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Invoice Details</h2>
+            <p><strong>Invoice Number:</strong> {selectedRecord.invoiceNumber || 'N/A'}</p>
            <p><strong>Invoice Date:</strong> {selectedRecord.invoiceDate || 'N/A'}</p>
            <p><strong>Party Name:</strong> {selectedRecord.partyDetails?.name || 'N/A'}</p>
            <p><strong>Address:</strong> {selectedRecord.partyDetails?.address || 'N/A'}</p>
@@ -371,15 +324,15 @@ const PurchaseList = () => {
 
            <h4><strong>Grand Total:</strong> ₹{(selectedRecord.totals?.grandTotal || 0).toFixed(2)}</h4>
            <button className="modal-close-btn" onClick={closeModal}>Close</button>
-         </div>
-       </div>
+          </div>
+        </div>
       )}
 
       {/* Edit/Create Modal */}
       {isEditModalOpen && (
         <div className="modal">
           <div className="modal-content">
-            <InvoiceGenerator
+          <InvoiceGenerator
               editInvoice={selectedRecord}
               isEditMode={isEditMode}
               onReset={closeModal}
@@ -392,6 +345,67 @@ const PurchaseList = () => {
       )}
     </div>
   );
+};
+
+const styles = {
+  container: {
+    padding: "20px",
+    fontFamily: "Arial, sans-serif",
+  },
+  heading: {
+    textAlign: "center",
+    color: "#333",
+    marginBottom: "20px",
+  },
+  searchInput: {
+    width: "100%",
+    padding: "10px",
+    border: "1px solid #ddd",
+    borderRadius: "5px",
+    marginBottom: "20px",
+    fontSize: "16px",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    backgroundColor: "#f9f9f9",
+  },
+  actionColumn: {
+    display: "flex",
+    gap: "10px",
+  },
+  actionButton: {
+    padding: "8px 12px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
+  deleteButton: {
+    backgroundColor: "#ff4d4d",
+  },
+  footerButtons: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginTop: "20px",
+  },
+  navButton: {
+    padding: "10px 20px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
+  createButton: {
+    padding: "10px 20px",
+    backgroundColor: "#28a745",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
 };
 
 export default PurchaseList;

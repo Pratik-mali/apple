@@ -16,52 +16,71 @@ const ProductList = ({ products }) => {
   };
 
   return (
-    <div>
-      <h2>Product List</h2>
+    <div style={styles.container}>
+      <h2 style={styles.heading}>Product List</h2>
       {products.length > 0 ? (
-        <table style={styles.table}>
-          <thead>
-            <tr style={styles.headerRow}>
-              <th style={styles.th}>Product Name</th>
-              <th style={styles.th}>Transliterated Name</th>
-              <th style={styles.th}>Product Unit</th>
-              <th style={styles.th}>Product Code</th>
-              <th style={styles.th}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id} style={styles.row}>
-                <td style={styles.td}>{product.productName}</td>
-                <td style={styles.td}>{product.transliteratedName}</td>
-                <td style={styles.td}>{product.productUnit}</td>
-                <td style={styles.td}>{product.productCode}</td>
-                <td style={styles.td}>
-                  <button
-                    style={styles.deleteButton}
-                    onClick={() => handleDelete(product.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
+        <div style={styles.tableContainer}>
+          <table style={styles.table}>
+            <thead>
+              <tr style={styles.headerRow}>
+                <th style={styles.th}>Product Name</th>
+                <th style={styles.th}>Transliterated Name</th>
+                <th style={styles.th}>Product Unit</th>
+                <th style={styles.th}>Product Code</th>
+                <th style={styles.th}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id} style={styles.row}>
+                  <td style={styles.td}>{product.productName}</td>
+                  <td style={styles.td}>{product.transliteratedName}</td>
+                  <td style={styles.td}>{product.productUnit}</td>
+                  <td style={styles.td}>{product.productCode}</td>
+                  <td style={styles.td}>
+                    <button
+                      style={styles.deleteButton}
+                      onClick={() => handleDelete(product.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
-        <p>No products added yet.</p>
+        <p style={styles.noProducts}>No products added yet.</p>
       )}
     </div>
   );
 };
 
-// Styles for the table and other elements
+// Optimized Styles
 const styles = {
+  container: {
+    maxWidth: "100%",
+    padding: "20px",
+    margin: "0 auto",
+    fontFamily: "Arial, sans-serif",
+  },
+  heading: {
+    marginBottom: "10px",
+    textAlign: "center",
+    fontSize: "1.5rem",
+    color: "#333",
+  },
+  tableContainer: {
+    maxHeight: "300px", // Set max height for table
+    overflowY: "auto", // Enable vertical scrolling
+    border: "1px solid #ddd",
+    borderRadius: "5px",
+  },
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    marginTop: "10px",
-    fontFamily: "Arial, sans-serif",
+    tableLayout: "fixed", // Fixed layout to prevent excessive width
   },
   headerRow: {
     backgroundColor: "#f4f4f4",
@@ -71,14 +90,19 @@ const styles = {
     padding: "8px",
     textAlign: "left",
     fontWeight: "bold",
+    whiteSpace: "nowrap", // Prevent wrapping of header text
   },
   td: {
     border: "1px solid #ddd",
     padding: "8px",
     textAlign: "left",
+    whiteSpace: "nowrap", // Prevent wrapping of data text
+    overflow: "hidden",
+    textOverflow: "ellipsis", // Add ellipsis for overflowed text
   },
   row: {
     backgroundColor: "#fff",
+    "&:hover": { backgroundColor: "#f9f9f9" }, // Hover effect for rows
   },
   deleteButton: {
     padding: "5px 10px",
@@ -87,6 +111,14 @@ const styles = {
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
+    transition: "background-color 0.2s",
+    "&:hover": { backgroundColor: "#ff1a1a" },
+  },
+  noProducts: {
+    textAlign: "center",
+    fontSize: "1rem",
+    color: "#888",
+    marginTop: "20px",
   },
 };
 

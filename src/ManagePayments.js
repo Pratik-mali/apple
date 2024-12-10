@@ -85,35 +85,40 @@ const ManagePayments = () => {
   };
 
   const handleMakePayment = async () => {
-    if (!newPayment.amount || !newPayment.mode) {
-      alert('Please enter a valid amount and mode of payment.');
+    const { amount, mode, date, voucherType, voucherNumber } = newPayment;
+  
+    if (!amount || !mode || !date || !voucherType || !voucherNumber) {
+      alert('Please fill out all fields before submitting.');
       return;
     }
-
+  
     const updatedParties = parties.map((party) => {
       if (party.name === selectedParty) {
         return {
           ...party,
-          unpaidAmount: (party.unpaidAmount || 0) - Number(newPayment.amount),
+          unpaidAmount: (party.unpaidAmount || 0) - Number(amount),
         };
       }
       return party;
     });
-
+  
     setParties(updatedParties);
     setFilteredParties(updatedParties);
-
+  
     await addDoc(collection(db, 'Payments'), {
       partyName: selectedParty,
-      amount: Number(newPayment.amount),
-      mode: newPayment.mode,
-      date: new Date().toISOString(),
+      amount: Number(amount),
+      mode,
+      date,
+      voucherType,
+      voucherNumber,
     });
-
-    setNewPayment({ amount: '', mode: '' });
+  
+    setNewPayment({ amount: '', mode: '', date: '', voucherType: '', voucherNumber: '' });
     setPaymentPopup(false);
     alert('Payment recorded successfully!');
   };
+  
 
   const currentPageRecords = filteredParties.slice(
     (currentPage - 1) * recordsPerPage,
@@ -201,58 +206,88 @@ const ManagePayments = () => {
 
       {/* Payment Popup */}
       {paymentPopup && (
-        <div style={popupStyle}>
-          <h2>Make Payment for {selectedParty}</h2>
-          <input
-            type="number"
-            placeholder="Enter Amount"
-            value={newPayment.amount}
-            onChange={(e) => setNewPayment({ ...newPayment, amount: e.target.value })}
-            style={inputStyle}
-          />
-          <input
-            type="text"
-            placeholder="Mode of Payment"
-            value={newPayment.mode}
-            onChange={(e) => setNewPayment({ ...newPayment, mode: e.target.value })}
-            style={inputStyle}
-          />
-          <button onClick={handleMakePayment} style={buttonStyle}>
-            Submit
-          </button>
-          <button onClick={() => setPaymentPopup(false)} style={{ ...buttonStyle, background: 'red' }}>
-            Cancel
-          </button>
-        </div>
-      )}
+  <div style={popupStyle}>
+    <h2>Make Payment for {selectedParty}</h2>
+    <input
+      type="number"
+      placeholder="Enter Paid Amount"
+      value={newPayment.amount}
+      onChange={(e) => setNewPayment({ ...newPayment, amount: e.target.value })}
+      style={inputStyle}
+    />
+    <input
+      type="text"
+      placeholder="Enter Payment Mode"
+      value={newPayment.mode}
+      onChange={(e) => setNewPayment({ ...newPayment, mode: e.target.value })}
+      style={inputStyle}
+    />
+    <input
+      type="date"
+      placeholder="Enter Payment Date"
+      value={newPayment.date}
+      onChange={(e) => setNewPayment({ ...newPayment, date: e.target.value })}
+      style={inputStyle}
+    />
+    <select
+      value={newPayment.voucherType}
+      onChange={(e) => setNewPayment({ ...newPayment, voucherType: e.target.value })}
+      style={inputStyle}
+    >
+      <option value="" disabled>
+        Select Voucher Type
+      </option>
+      <option value="Sale">Sale</option>
+      <option value="Receipt">Receipt</option>
+    </select>
+    <input
+      type="text"
+      placeholder="Enter Voucher Number"
+      value={newPayment.voucherNumber}
+      onChange={(e) => setNewPayment({ ...newPayment, voucherNumber: e.target.value })}
+      style={inputStyle}
+    />
+    <button onClick={handleMakePayment} style={buttonStyle}>
+      Submit
+    </button>
+    <button onClick={() => setPaymentPopup(false)} style={{ ...buttonStyle, background: 'red' }}>
+      Cancel
+    </button>
+  </div>
+)}
 
       {/* View Payments Popup */}
       {viewPaymentsPopup && (
-        <div style={popupStyle}>
-          <h2>Payments for {selectedParty}</h2>
-          <table border="1" style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Amount</th>
-                <th>Mode</th>
-              </tr>
-            </thead>
-            <tbody>
-              {payments.map((payment, index) => (
-                <tr key={index}>
-                  <td>{new Date(payment.date).toLocaleDateString()}</td>
-                  <td>{payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
-                  <td>{payment.mode}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button onClick={() => setViewPaymentsPopup(false)} style={buttonStyle}>
-            Close
-          </button>
-        </div>
-      )}
+  <div style={popupStyle}>
+    <h2>Payments for {selectedParty}</h2>
+    <table border="1" style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Voucher Type</th>
+          <th>Voucher Number</th>
+          <th>Paid Amount</th>
+          <th>Payment Mode</th>
+        </tr>
+      </thead>
+      <tbody>
+        {payments.map((payment, index) => (
+          <tr key={index}>
+            <td>{new Date(payment.date).toLocaleDateString()}</td>
+            <td>{payment.voucherType || 'N/A'}</td>
+            <td>{payment.voucherNumber || 'N/A'}</td>
+            <td>{payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
+            <td>{payment.mode}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <button onClick={() => setViewPaymentsPopup(false)} style={buttonStyle}>
+      Close
+    </button>
+  </div>
+)}
+
     </div>
   );
 };

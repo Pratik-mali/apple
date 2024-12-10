@@ -11,6 +11,8 @@ import PurchaseList from "./PurchaseList";
 import ManagePayments from "./ManagePayments";
 import GSTGenerator from "./GSTGenerator";
 import GSTList from "./GSTList";
+import LedgerReport from "./LedgerReport";
+import Dash from "./Dash";
 
 // import Customers from "./Customers";
 // import Reports from "./Reports";
@@ -43,13 +45,16 @@ const Dashboard = () => {
             case "GSTGenerator":
               return <GSTGenerator />
 
+              case "LedgerReport":
+                return <LedgerReport />
+
               case "GSTList":
                 return <GSTList />
 
               
               
       default:
-        return <Inventory />;
+        return <Dash />;
     }
   };
 
