@@ -140,4 +140,32 @@
       padding: 8px;
     }
   }
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #ledger-content, #ledger-content * {
+      visibility: visible;
+    }
+    #ledger-content {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+  }
+  @media print {
+    body * {
+      display: none; /* Hides everything else */
+    }
+    #ledger-content, #ledger-content * {
+      display: block; /* Ensures the content is visible */
+    }
+    #ledger-content {
+      position: static; /* Or absolute if needed */
+      width: 100%;
+      margin: 0;
+    }
+  }
+  
   

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { db } from './firebase';
 import { collection, query, orderBy, getDocs, startAfter, limit, deleteDoc, doc } from 'firebase/firestore';
 import InvoiceGenerator from './InvoiceGenerator';
+import { PDFViewer } from '@react-pdf/renderer';
+import InvoicePrint from './InvoicePrint'
 
 const PurchaseList = () => {
   const [records, setRecords] = useState([]);
@@ -276,54 +278,14 @@ const PurchaseList = () => {
 
       {/* View Modal */}
       {isViewModalOpen && selectedRecord && (
-        <div className="modal">
+         <div className="modal">
           <div className="modal-content">
-            <h2>Invoice Details</h2>
-            <p><strong>Invoice Number:</strong> {selectedRecord.invoiceNumber || 'N/A'}</p>
-           <p><strong>Invoice Date:</strong> {selectedRecord.invoiceDate || 'N/A'}</p>
-           <p><strong>Party Name:</strong> {selectedRecord.partyDetails?.name || 'N/A'}</p>
-           <p><strong>Address:</strong> {selectedRecord.partyDetails?.address || 'N/A'}</p>
-           <p><strong>GSTIN:</strong> {selectedRecord.partyDetails?.gstin || 'N/A'}</p>
-
-           <h3>Purchased Products</h3>
-           <table>
-             <thead>
-               <tr>
-                 <th>Product Name</th>
-                 <th>Quantity</th>
-                 <th>Rate</th>
-                 <th>Amount</th>
-                 <th>Discount</th>
-                 <th>Size</th>
-               </tr>
-             </thead>
-             <tbody>
-               {selectedRecord.products?.map((product, index) => (
-                 <tr key={index}>
-                   <td>{product.name || 'N/A'}</td>
-                   <td>{product.quantity || 0}</td>
-                   <td>₹{(product.rate || 0).toFixed(2)}</td>
-                   <td>₹{(product.amount || 0).toFixed(2)}</td>
-                   
-                   <td>₹{(parseFloat(product.discount) || 0).toFixed(2)}</td>
-                   <td>{product.size || 'N/A'}</td>
-                 </tr>
-               ))}
-             </tbody>
-           </table>
-
-           <h3>Invoice Totals</h3>
-           <p><strong>Total Amount:</strong> ₹{(selectedRecord.totals?.totalAmount || 0).toFixed(2)}</p>
-           <p><strong>Discount:</strong> ₹{(selectedRecord.totals?.totalDiscount || 0).toFixed(2)}</p>
-
-           <p><strong>CGST:</strong> ₹{(selectedRecord.totals?.cgst || 0).toFixed(2)}</p>
-           <p><strong>SGST:</strong> ₹{(selectedRecord.totals?.sgst || 0).toFixed(2)}</p>
-           <p><strong>IGST:</strong> ₹{(selectedRecord.totals?.igst || 0).toFixed(2)}</p>
-           <p><strong>Total Tax:</strong> ₹{(selectedRecord.totals?.totalTax || 0).toFixed(2)}</p>
-           <p><strong>Round OFF:</strong> ₹{(selectedRecord.totals?.roundOff || 0).toFixed(2)}</p>
-
-           <h4><strong>Grand Total:</strong> ₹{(selectedRecord.totals?.grandTotal || 0).toFixed(2)}</h4>
-           <button className="modal-close-btn" onClick={closeModal}>Close</button>
+       <PDFViewer style={{ width: "100%", height: "600px" }}>
+            <InvoicePrint invoiceData={selectedRecord} />
+          </PDFViewer>
+          <button className="modal-close-btn" onClick={closeModal}>
+              Close
+            </button>
           </div>
         </div>
       )}

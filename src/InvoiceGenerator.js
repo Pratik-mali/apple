@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
-import ReactPDF from '@react-pdf/renderer';
 import { where} from "firebase/firestore";
+import { PDFViewer } from '@react-pdf/renderer';
 
 
 import {
@@ -13,6 +13,11 @@ import {
   addDoc,
   updateDoc, doc
 } from 'firebase/firestore';
+import { Modal, Box, Button, Typography } from "@mui/material";
+import InvoicePrint from "./InvoicePrint"; // Import your InvoicePrint component
+
+
+
 
 
 const InvoiceGenerator = ({ editInvoice, isEditMode, onReset }) => {
@@ -50,6 +55,8 @@ const InvoiceGenerator = ({ editInvoice, isEditMode, onReset }) => {
   const [sgstRate, setSgstRate] = useState(2.5);
   const [igstRate, setIgstRate] = useState(0);
   const [roundOff, setRoundOff] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+const [previewInvoice, setPreviewInvoice] = useState(null);
 
 
   const [suggestions, setSuggestions] = useState([]);
@@ -316,24 +323,24 @@ const resetForm = () => {
         igstRate,
         totals: calculateTotals(),
       };
-
+  
       if (isEditMode && editInvoice?.id) {
-        // Update the existing invoice
-        await updateDoc(doc(db, 'PurchaseInvoices', editInvoice.id), invoiceData);
-        alert('Invoice updated successfully!');
+        await updateDoc(doc(db, "PurchaseInvoices", editInvoice.id), invoiceData);
+        alert("Invoice updated successfully!");
       } else {
-        // Create a new invoice
-        await addDoc(collection(db, 'PurchaseInvoices'), invoiceData);
-        alert('Invoice saved successfully!');
+        await addDoc(collection(db, "PurchaseInvoices"), invoiceData);
+        alert("Invoice saved successfully!");
       }
-
+  
+      setPreviewInvoice(invoiceData); // Set the invoice for preview
+      setIsModalOpen(true); // Open the modal
       resetForm();
-      onReset(); // Notify parent to reset state
+      onReset();
     } catch (error) {
-      console.error('Error saving invoice:', error);
-      alert('Failed to save the invoice.');
+      console.error("Error saving invoice:", error);
     }
   };
+  
 
   const totals = calculateTotals();
   const styles = {
@@ -645,6 +652,47 @@ const resetForm = () => {
       <button onClick={handleSaveInvoice} style={styles.button}>
         Save Invoice
       </button>
+      <Modal
+  open={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  aria-labelledby="invoice-preview-title"
+  aria-describedby="invoice-preview-description"
+>
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: "80%",
+      height: "80%",
+      bgcolor: "background.paper",
+      boxShadow: 24,
+      p: 4,
+      borderRadius: 2,
+    }}
+  >
+    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+      <Typography id="invoice-preview-title" variant="h6" component="h2">
+        Invoice Preview
+      </Typography>
+      <Button
+        variant="contained"
+        color="error"
+        onClick={() => setIsModalOpen(false)}
+      >
+        Close
+      </Button>
+    </Box>
+    {previewInvoice && (
+      <PDFViewer style={{ width: "100%", height: "calc(100% - 50px)" }}>
+        <InvoicePrint invoiceData={previewInvoice} />
+      </PDFViewer>
+    )}
+  </Box>
+</Modal>
+
+
     </div>
   );
 };

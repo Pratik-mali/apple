@@ -8,7 +8,7 @@ const InvoiceList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredInvoices, setFilteredInvoices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchInvoices = async () => {
