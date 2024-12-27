@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "./firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 
 const InvoiceList = () => {
@@ -57,6 +57,25 @@ const InvoiceList = () => {
     }
   };
 
+  const handleDeleteInvoice = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this invoice?"
+    );
+    if (confirmDelete) {
+      try {
+        await deleteDoc(doc(db, "invoices", id));
+        // Update the state to reflect deletion
+        const updatedInvoices = invoices.filter((invoice) => invoice.id !== id);
+        setInvoices(updatedInvoices);
+        setFilteredInvoices(updatedInvoices);
+        alert("Invoice deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting invoice:", error);
+        alert("Failed to delete the invoice. Please try again.");
+      }
+    }
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <h1>Invoice List</h1>
@@ -102,6 +121,19 @@ const InvoiceList = () => {
                 </td>
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                   <Link to={`/invoice/${invoice.id}`}>View Invoice</Link>
+                  <button
+                    onClick={() => handleDeleteInvoice(invoice.id)}
+                    style={{
+                      marginLeft: "10px",
+                      padding: "5px 10px",
+                      backgroundColor: "#ff4d4d",
+                      color: "white",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))

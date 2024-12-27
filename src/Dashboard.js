@@ -6,12 +6,16 @@ import Inventory from "./Inventory";
 import Billing from "./Billing";
 import InvoiceList from "./InvoiceList";
 import CustomerComponent from "./CustomerComponent";
+import DueCustomerComponent from "./DueCustomerComponent";
+
 import InvoiceGenerator from "./InvoiceGenerator";
 import PurchaseList from "./PurchaseList";
 import ManagePayments from "./ManagePayments";
 import GSTGenerator from "./GSTGenerator";
 import GSTList from "./GSTList";
 import LedgerReport from "./LedgerReport";
+import CombinedLedgerReport from "./CombinedLedgerReport";
+
 import Dash from "./Dash";
 
 // import Customers from "./Customers";
@@ -30,6 +34,8 @@ const Dashboard = () => {
         return <Billing />;
       case "Customers":
         return <CustomerComponent />;
+        case "DueCustomers":
+        return <DueCustomerComponent />;
       // case "Reports":
       //   return <Reports />;
       case "InvoiceList":
@@ -47,6 +53,10 @@ const Dashboard = () => {
 
               case "LedgerReport":
                 return <LedgerReport />
+
+                
+              case "CombinedLedgerReport":
+                return <CombinedLedgerReport />
 
               case "GSTList":
                 return <GSTList />

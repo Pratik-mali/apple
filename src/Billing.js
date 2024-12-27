@@ -16,7 +16,7 @@ import { saveAs } from "file-saver"; // For downloading the file
 const Billing = () => {
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
-  const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState("Cash");
   const [isNewCustomer, setIsNewCustomer] = useState(false);
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [highlightedCustomerIndex, setHighlightedCustomerIndex] = useState(-1);
@@ -27,8 +27,8 @@ const Billing = () => {
   ]);
   const [paidAmount, setPaidAmount] = useState("");
   const [focusedIndex, setFocusedIndex] = useState(-1);
-  const [contactNumber, setContactNumber] = useState("");
-const [address, setAddress] = useState("");
+  const [contactNumber, setContactNumber] = useState("+91 96655 26332");
+const [address, setAddress] = useState("Tulshi");
 const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variable
 
 
@@ -319,7 +319,7 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
   
   const resetForm = () => {
     setFormFields([{ productName: "", price: "", quantity: "", discount: "" }]);
-    setSelectedCustomer("");
+    setSelectedCustomer("Cash");
     setIsNewCustomer(false);
     setFilteredCustomers([]);
     setHighlightedCustomerIndex(-1);
@@ -327,8 +327,8 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
     setHighlightedProductIndex(-1);
     setPaidAmount("");
     setFocusedIndex(-1);
-    setContactNumber("");
-    setAddress("");
+    setContactNumber("+91 96655 26332");
+    setAddress("Tulshi");
     setOutstandingAmount(0);
     inputRefs.current = []; // Reset input references if used
   };
