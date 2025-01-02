@@ -6,6 +6,10 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
+import CustomerPDF from "./CustomerPDF"; // Import the PDF layout component
+import { PDFDownloadLink } from "@react-pdf/renderer";
+
+
 
 const DueCustomersComponent = () => {
   const [customers, setCustomers] = useState([]);
@@ -203,6 +207,17 @@ const DueCustomersComponent = () => {
         <button onClick={handleNextPage} disabled={currentPage === totalPages}>
           Next
         </button>
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <PDFDownloadLink
+          document={<CustomerPDF customers={filteredCustomers} />}
+          fileName="customers_with_dues.pdf"
+        >
+          {({ loading }) =>
+            loading ? "Generating PDF..." : <button>Download PDF</button>
+          }
+        </PDFDownloadLink>
       </div>
     </div>
   );
