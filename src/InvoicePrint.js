@@ -178,7 +178,7 @@ const InvoicePrint = ({ invoiceData }) => (
         </Text>
         <Text style={styles.gstin}>GSTIN: 27FIMPD7877K1ZE</Text>
         <View style={styles.messageStrip}>
-          <Text style={styles.messageText}>"Delivering Quality and Trust"</Text>
+          <Text style={styles.messageText}>"Purchase Invoice"</Text>
         </View>
       </View>
 
@@ -192,8 +192,10 @@ const InvoicePrint = ({ invoiceData }) => (
             <Text style={styles.value}>GSTIN: {invoiceData.partyDetails.gstin}</Text>
           </View>
           <View>
-            <Text style={styles.label}>Invoice No: INV-2024001</Text>
-            <Text style={styles.label}>Date: {new Date().toLocaleDateString()}</Text>
+            <Text style={styles.label}>Invoice No:  {invoiceData.invoiceNumber}</Text>
+            <Text style={styles.label}>
+  Date: {new Date(invoiceData.invoiceDate).toLocaleDateString('en-GB')}
+</Text>
           </View>
         </View>
       </View>
