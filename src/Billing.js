@@ -234,87 +234,89 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
   
 
   const handleStoreInvoice = async () => {
-    try {
-      // Prepare invoice data
-      const invoiceData = {
-        customer: {
-          name: selectedCustomer,
-          contactNumber,
-          address,
-          isNewCustomer,
-        },
-        products: formFields.map((field) => ({
-          productName: field.productName,
-          price: parseFloat(field.price) || 0,
-          quantity: parseFloat(field.quantity) || 0,
-          discount: parseFloat(field.discount) || 0,
-          amount:
-            (parseFloat(field.price) || 0) *
-            (parseFloat(field.quantity) || 0) *
-            (1 - (parseFloat(field.discount) || 0) / 100),
-        })),
-        totals: {
-          totalAmount: total.totalAmount,
-          totalDiscount: total.totalDiscount,
-          finalAmount: total.finalAmount,
-          paidAmount: parseFloat(paidAmount) || 0,
-          dueAmount: dueAmount,
-        },
-        timestamp: new Date().toISOString(),
-      };
-  
-      // Save invoice to Firestore
-      const invoiceRef = await addDoc(collection(db, "invoices"), invoiceData);
-      alert(`Invoice stored successfully with ID: ${invoiceRef.id}`);
-      resetForm();
-  
-      // Generate PDF
-      const pdfDoc = pdf(<InvoicePDF invoiceData={invoiceData} />);
-      const blob = await pdfDoc.toBlob();
-  
-      // Open a temporary window
-      const printWindow = window.open("", "_blank", "width=800,height=600");
-      if (printWindow) {
-        const pdfUrl = URL.createObjectURL(blob);
-  
-        // Write the iframe HTML
-        printWindow.document.write(`
-          <html>
-            <head><title>Print Invoice</title></head>
-            <body style="margin: 0; padding: 0;">
-              <iframe id="printFrame" 
-                      src="${pdfUrl}" 
-                      style="width:100%;height:100%;border:none;" 
-                      frameborder="0">
-              </iframe>
-            </body>
-          </html>
-        `);
-  
-        // Wait for the iframe to load
-        printWindow.document.close();
-        const iframe = printWindow.document.getElementById("printFrame");
-  
-        iframe.onload = () => {
-          const iframeWindow = iframe.contentWindow || iframe;
-  
-          // Attach an event listener to detect after printing
-          iframeWindow.onafterprint = () => {
-            printWindow.close();
-          };
-  
-          // Trigger printing
-          iframeWindow.focus();
-          iframeWindow.print();
-        };
-      }
-    } catch (error) {
-      console.error("Error storing invoice: ", error);
-      alert("Failed to store invoice. Please try again.");
+  try {
+    // Prepare invoice data
+    const invoiceData = {
+      customer: {
+        name: selectedCustomer,
+        contactNumber,
+        address,
+        isNewCustomer,
+      },
+      products: formFields.map((field) => ({
+        productName: field.productName,
+        price: parseFloat(field.price) || 0,
+        quantity: parseFloat(field.quantity) || 0,
+        discount: parseFloat(field.discount) || 0,
+        amount:
+          (parseFloat(field.price) || 0) *
+          (parseFloat(field.quantity) || 0) *
+          (1 - (parseFloat(field.discount) || 0) / 100),
+      })),
+      totals: {
+        totalAmount: total.totalAmount,
+        totalDiscount: total.totalDiscount,
+        finalAmount: total.finalAmount,
+        paidAmount: parseFloat(paidAmount) || 0,
+        dueAmount: dueAmount,
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    // Save invoice to Firestore
+    const invoiceRef = await addDoc(collection(db, "invoices"), invoiceData);
+
+    // Send data to the PHP script
+    const apiUrl = `https://yourdomain.com/store_invoice.php`;
+    const queryParams = new URLSearchParams({
+      contact_number: contactNumber,
+      invoice_id: invoiceRef.id,
+      api_key: "Happysoul8610",
+    });
+    
+    const response = await fetch(`${apiUrl}?${queryParams}`);
+    if (!response.ok) {
+      throw new Error("Failed to send data to PHP script");
     }
-  };
-  
-  
+
+    alert(`Invoice stored successfully with ID: ${invoiceRef.id}`);
+    resetForm();
+
+    // Generate PDF (rest of the code remains unchanged)
+    const pdfDoc = pdf(<InvoicePDF invoiceData={invoiceData} />);
+    const blob = await pdfDoc.toBlob();
+    const printWindow = window.open("", "_blank", "width=800,height=600");
+    if (printWindow) {
+      const pdfUrl = URL.createObjectURL(blob);
+      printWindow.document.write(`
+        <html>
+          <head><title>Print Invoice</title></head>
+          <body style="margin: 0; padding: 0;">
+            <iframe id="printFrame" 
+                    src="${pdfUrl}" 
+                    style="width:100%;height:100%;border:none;" 
+                    frameborder="0">
+            </iframe>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      const iframe = printWindow.document.getElementById("printFrame");
+      iframe.onload = () => {
+        const iframeWindow = iframe.contentWindow || iframe;
+        iframeWindow.onafterprint = () => {
+          printWindow.close();
+        };
+        iframeWindow.focus();
+        iframeWindow.print();
+      };
+    }
+  } catch (error) {
+    console.error("Error storing invoice: ", error);
+    alert("Failed to store invoice. Please try again.");
+  }
+};
+
   
   
   const resetForm = () => {
