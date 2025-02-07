@@ -27,7 +27,7 @@ const Billing = () => {
   ]);
   const [paidAmount, setPaidAmount] = useState("");
   const [focusedIndex, setFocusedIndex] = useState(-1);
-  const [contactNumber, setContactNumber] = useState("+91 96655 26332");
+  const [contactNumber, setContactNumber] = useState("9665526332");
 const [address, setAddress] = useState("Tulshi");
 const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variable
 
@@ -267,7 +267,7 @@ const [outstandingAmount, setOutstandingAmount] = useState(0); // Renamed variab
     const invoiceRef = await addDoc(collection(db, "invoices"), invoiceData);
 
     // Send data to the PHP script
-    const apiUrl = `https://tealy.in/PI/store_invoice.php`;
+    const apiUrl = `https://paraminnovatex.com/store_invoice.php`;
     const queryParams = new URLSearchParams({
       contact_number: contactNumber,
       invoice_id: invoiceRef.id,
